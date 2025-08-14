@@ -16,8 +16,20 @@ void Rocket::update(float deltaTime)
     
     // calc accel 
     float thrustForce = thrust * MAX_THRUST; 
-    float a_x = (thrustForce* cos(degToRad(rotation))) /mass;
-    float a_y = (thrustForce* sin(degToRad(rotation)) - GRAVITY)/mass;
+    
+    
+    float angleRad = degToRad(rotation);
+
+    // Thrust in direction of rocket
+    float a_thrust_x = (thrustForce * cos(angleRad)) / mass;
+    float a_thrust_y = (thrustForce * sin(angleRad)) / mass;
+
+    // Gravity only along y
+    float a_gravity_y = -GRAVITY;  // positive up in math coordinates
+
+    // Total acceleration
+    float a_x = a_thrust_x;
+    float a_y = a_thrust_y + a_gravity_y;
 
     // calc final vels  
     float v_f_y = yVel+a_y*deltaTime; 
@@ -64,11 +76,11 @@ void Rocket::setThrust(float t) {
 }
 
 // --- Position ---
-int Rocket::getX() const { return x; }
-void Rocket::setX(int newX) { x = newX; }
+float Rocket::getX() const { return x; }
+void Rocket::setX(float newX) { x = newX; }
 
-int Rocket::getY() const { return y; }
-void Rocket::setY(int newY) { y = newY; }
+float Rocket::getY() const { return y; }
+void Rocket::setY(float newY) { y = newY; }
 
 // --- Velocity ---
 float Rocket::getXVel() const { return xVel; }

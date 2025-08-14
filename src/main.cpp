@@ -7,10 +7,10 @@ int main()
     
     Rocket rocket(950,540); 
     RocketVisual rv(rocket); 
-    //rv.setThrust(1.0f);
+    rv.setThrust(1.0f);
+
     sf::Clock clock; 
-    std::cout<<"Math To SFML: "<<Rocket::mathToSfmlAngle(rv.getRocket().getRotation())<<std::endl; 
-    std::cout<<"Straight from rocket: "<<rv.getRocket().getRotation()<<std::endl; 
+    
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
@@ -23,18 +23,23 @@ int main()
                 if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
                     window.close();
 
-                if(keyPressed->scancode == sf::Keyboard::Scancode::Space){
-                    rv.rotate(10); 
-                    std::cout<<"Math To SFML: "<<Rocket::mathToSfmlAngle(rv.getRocket().getRotation())<<std::endl; 
-                    std::cout<<"Straight from rocket: "<<rv.getRocket().getRotation()<<std::endl; 
+                if(keyPressed->scancode == sf::Keyboard::Scancode::A){
+                    rv.rotate(15); 
+                }
+                if(keyPressed->scancode == sf::Keyboard::Scancode::D){
+                    rv.rotate(-15); 
                 }
             }
         }
 
         // update 
         float deltaTime = clock.restart().asSeconds(); 
-        //rocket.update(deltaTime); 
+        std::cout<<"Rocket Rotation: "<< rocket.getRotation()<<std::endl; 
+        rocket.update(deltaTime); 
         
+        std::cout<<"Pos(x,y): "<< rv.getRocket().getX()<<" , "<<rv.getRocket().getY()<<std::endl; 
+        std::cout<<"Vel(x,y): "<< rv.getRocket().getXVel()<<" , "<<rv.getRocket().getYVel()<<std::endl; 
+
         window.clear();
         // draw
         rv.draw(window); 
