@@ -1,0 +1,5 @@
+// build and run 
+cmake --preset debug; cmake --build --preset debug; ./build/bin/DroneEvo.exe
+
+// delete and rebuild 
+Remove-Item -Recurse -Force build; cmake --preset debug; cmake --build --preset debug; ./build/bin/DroneEvo.exe

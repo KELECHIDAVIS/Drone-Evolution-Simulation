@@ -1,5 +1,15 @@
 #include "Rocket.hpp"
 
+int Rocket::sfmlToMathAngle(int sfAngleDeg)
+{
+    return (90.f - sfAngleDeg) ; 
+}
+
+int Rocket::mathToSfmlAngle(int mathAngleDeg)
+{
+    return 90.f - (mathAngleDeg);
+}
+
 void Rocket::update(float deltaTime)
 {
     // every frame update the rocket's pos based on gravity and thrust
@@ -20,6 +30,12 @@ void Rocket::update(float deltaTime)
     // set init vels to finals 
     yVel= v_f_y;
     xVel = v_f_x; 
+}
+
+// SHOULD BE IN MATH DEGS NOT SFML
+void Rocket::rotate(int deg)
+{
+    setRotation(getRotation() + deg); 
 }
 
 float Rocket::degToRad(int deg)
