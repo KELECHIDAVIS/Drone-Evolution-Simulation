@@ -13,8 +13,6 @@ int main()
     rv.setThrust(1.0f);
 
     sf::Clock clock; 
-    std::cout<<"Rocket Local pos: \n"<< rv.getRocket().vLocal<<std::endl<<std::endl; ; 
-    std::cout<<"Rocket World pos: \n"<< rv.getRocket().getVertices()<<std::endl<<"Center Pos: \n"<<rv.getRocket().pos; 
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
@@ -29,11 +27,9 @@ int main()
 
                 if(keyPressed->scancode == sf::Keyboard::Scancode::A){
                     rv.rotate(15); 
-                    std::cout<<"Rocket World pos: \n"<< rv.getRocket().getVertices()<<std::endl<<"Center Pos: \n"<<rv.getRocket().pos; 
                 }
                 if(keyPressed->scancode == sf::Keyboard::Scancode::D){
                     rv.rotate(-15); 
-                    std::cout<<"Rocket World pos: \n"<< rv.getRocket().getVertices()<<std::endl<<"Center Pos: \n"<<rv.getRocket().pos; 
                 }
             }
         }
