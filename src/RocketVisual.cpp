@@ -2,7 +2,7 @@
 
 void RocketVisual::draw(sf::RenderWindow &window){
     // SINCE AXISES ARE FLIPPED IN SFML DRAWING IT WITH THIS IS MIND SO THAT MATH IS NORMAL
-    body.setPosition(sf::Vector2f(this->rocket.getX(),window.getSize().y - this->rocket.getY() )); 
+    body.setPosition(sf::Vector2f(this->rocket.pos(0),window.getSize().y - this->rocket.pos(1) )); 
     body.setRotation(sf::degrees(Rocket::mathToSfmlAngle((this->rocket.getRotation()))));
     window.draw(body);
 }

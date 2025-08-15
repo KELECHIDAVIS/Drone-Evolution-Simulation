@@ -13,12 +13,12 @@ void Environment::update(float deltaTime){
 void Environment::checkCollision()
 {
     // first make sure they are close enough to check 
-    float dx = target.x - rocket.getX(); 
-    float dy = target.y - rocket.getY();
+    float dx = target.x - rocket.pos(0); 
+    float dy = target.y - rocket.pos(1);
     
     float dist = sqrt(dx*dx +dy*dy); 
 
-    if(dist <= target.radius*2+ rocket.getHeight())
+    if(dist <= target.radius*2+ rocket.height)
         return; 
     
     // else check intersection

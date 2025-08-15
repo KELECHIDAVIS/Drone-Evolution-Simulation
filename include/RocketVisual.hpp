@@ -17,8 +17,8 @@ public:
         body.setPointCount(3); 
         // Set points (tip at top, base at bottom)
         body.setPoint(0, sf::Vector2f(0.f, 0.f));          // top tip
-        body.setPoint(1, sf::Vector2f(-rocket.getBase()/2.f, rocket.getHeight())); // bottom-left
-        body.setPoint(2, sf::Vector2f(rocket.getBase()/2.f,rocket.getHeight()));  // bottom-right
+        body.setPoint(1, sf::Vector2f(-rocket.base/2.f, rocket.height)); // bottom-left
+        body.setPoint(2, sf::Vector2f(rocket.base/2.f,rocket.height));  // bottom-right
         body.setFillColor(sf::Color::Blue);    
         // Center the origin
         sf::FloatRect bounds = body.getLocalBounds();

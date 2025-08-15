@@ -32,16 +32,16 @@ void Rocket::update(float deltaTime)
     float a_y = a_thrust_y + a_gravity_y;
 
     // calc final vels  
-    float v_f_y = yVel+a_y*deltaTime; 
-    float v_f_x = xVel+a_x*deltaTime;
+    float v_f_y = vel(1) +a_y*deltaTime; 
+    float v_f_x = vel(0) +a_x*deltaTime;
     
     // calc final positions
-    x+= (v_f_x + xVel)*deltaTime/2.0; 
-    y+= (v_f_y + yVel)*deltaTime/2.0; 
+    pos(0)+= (v_f_x + vel(0))*deltaTime/2.0; 
+    pos(1) += (v_f_y + vel(1))*deltaTime/2.0; 
 
     // set init vels to finals 
-    yVel= v_f_y;
-    xVel = v_f_x; 
+    vel(1)= v_f_y;
+    vel(0) = v_f_x; 
 }
 
 // SHOULD BE IN MATH DEGS NOT SFML
@@ -54,9 +54,6 @@ float Rocket::degToRad(int deg)
 {
     return deg* (M_PI/180.0);  
 }
-
-// --- Mass ---
-float Rocket::getMass() const { return mass; }
 
 
 // --- Rotation ---
@@ -75,34 +72,6 @@ void Rocket::setThrust(float t) {
     else thrust = t;
 }
 
-// --- Position ---
-float Rocket::getX() const { return x; }
-void Rocket::setX(float newX) { x = newX; }
 
-float Rocket::getY() const { return y; }
-void Rocket::setY(float newY) { y = newY; }
 
-// --- Velocity ---
-float Rocket::getXVel() const { return xVel; }
-void Rocket::setXVel(float vx) { xVel = vx; }
 
-float Rocket::getYVel() const { return yVel; }
-
-float Rocket::getBase() const
-{
-    return base;
-}
-float Rocket::getHeight() const
-{
-    return height;
-}
-void Rocket::setYVel(float vy) { yVel = vy; }
-
-void Rocket::setBase(float base)
-{
-    base = base; 
-}
-void Rocket::setHeight(float height)
-{
-    height= height; 
-}
