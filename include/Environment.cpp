@@ -16,4 +16,17 @@ void Environment::checkCollision()
     float dy = target.y - rocket.getY();
     
     float dist = sqrt(dx*dx +dy*dy); 
+
+    if(dist <= target.radius*2+ rocket.getHeight())
+        return; 
+    
+    // else check intersection
+    bool intersection = separateAxis(); 
+}
+
+bool separateAxis(){
+    // get normals from triangle
+    // vertices are ccw
+    
+    return true; 
 }
