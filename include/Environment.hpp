@@ -9,6 +9,7 @@ public:
     int score=0; 
 
     void update(float deltaTime); 
+    bool separateAxis(); 
     void checkCollision(); 
 
 }; 

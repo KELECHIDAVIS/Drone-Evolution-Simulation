@@ -3,6 +3,8 @@ project(DroneEvo LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Enable C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,6 +20,24 @@ FetchContent_Declare(SFML
 )
 FetchContent_MakeAvailable(SFML)
 
+# -------------------------------
+# Eigen: prefer system package, fallback to FetchContent
+# -------------------------------
+# Try to find an installed Eigen first
+find_package(Eigen3 3.4 QUIET NO_MODULE)
+
+if (NOT Eigen3_FOUND)
+  message(STATUS "Eigen3 not found on the system — fetching via FetchContent")
+  FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 3.4.0    # or change to the specific tag you want
+    GIT_SHALLOW ON
+  )
+  FetchContent_MakeAvailable(eigen)
+  # After adding Eigen via FetchContent, the target is Eigen3::Eigen as well.
+endif()
+
 # Grab all source files in src/
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
@@ -31,3 +51,6 @@ target_include_directories(DroneEvo PRIVATE include)
 
 # Link SFML
 target_link_libraries(DroneEvo PRIVATE SFML::Graphics)
+
+# Link Eigen (header-only) — this exposes include dirs
+target_link_libraries(DroneEvo PRIVATE Eigen3::Eigen)

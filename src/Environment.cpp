@@ -9,6 +9,7 @@ void Environment::update(float deltaTime){
 //CAN FURTHER OPTIMIZE THIS 
 // ONLY CHECK COLLISION IF THEy ARE CLOSE (euclidean distance is is <= diameter of target + height of rocket)
 // SAT between 
+//USING LINEAR ALG TO MAKE FAST
 void Environment::checkCollision()
 {
     // first make sure they are close enough to check 
@@ -24,7 +25,7 @@ void Environment::checkCollision()
     bool intersection = separateAxis(); 
 }
 
-bool separateAxis(){
+bool Environment::separateAxis(){
     // get normals from triangle
     // vertices are ccw
     

@@ -1,7 +1,10 @@
 #include "RocketVisual.hpp"
 #include <iostream>
+
 int main()
 {
+    
+
     sf::RenderWindow window = sf::RenderWindow(sf::VideoMode({1920, 1080}), "Drone Evo");
     window.setFramerateLimit(144);
     
@@ -34,11 +37,7 @@ int main()
 
         // update 
         float deltaTime = clock.restart().asSeconds(); 
-        std::cout<<"Rocket Rotation: "<< rocket.getRotation()<<std::endl; 
         rocket.update(deltaTime); 
-        
-        std::cout<<"Pos(x,y): "<< rv.getRocket().getX()<<" , "<<rv.getRocket().getY()<<std::endl; 
-        std::cout<<"Vel(x,y): "<< rv.getRocket().getXVel()<<" , "<<rv.getRocket().getYVel()<<std::endl; 
 
         window.clear();
         // draw

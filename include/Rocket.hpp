@@ -39,7 +39,6 @@ public:
     float getHeight() const; 
     // Setters
     
-    void setMass(float m);
     void setRotation(int r);
     void setThrust(float t);
     void setX(float newX);

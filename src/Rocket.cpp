@@ -57,7 +57,7 @@ float Rocket::degToRad(int deg)
 
 // --- Mass ---
 float Rocket::getMass() const { return mass; }
-void Rocket::setMass(float m) { if(m > 0) mass = m; }
+
 
 // --- Rotation ---
 int Rocket::getRotation() const { return rotation; }
@@ -100,9 +100,9 @@ void Rocket::setYVel(float vy) { yVel = vy; }
 
 void Rocket::setBase(float base)
 {
-    this->base = base; 
+    base = base; 
 }
 void Rocket::setHeight(float height)
 {
-    this->height= height; 
+    height= height; 
 }
