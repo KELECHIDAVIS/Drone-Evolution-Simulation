@@ -87,4 +87,22 @@ float Rocket::getXVel() const { return xVel; }
 void Rocket::setXVel(float vx) { xVel = vx; }
 
 float Rocket::getYVel() const { return yVel; }
+
+float Rocket::getBase() const
+{
+    return base;
+}
+float Rocket::getHeight() const
+{
+    return height;
+}
 void Rocket::setYVel(float vy) { yVel = vy; }
+
+void Rocket::setBase(float base)
+{
+    this->base = base; 
+}
+void Rocket::setHeight(float height)
+{
+    this->height= height; 
+}
