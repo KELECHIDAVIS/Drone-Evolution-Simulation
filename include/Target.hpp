@@ -1,5 +1,6 @@
 #pragma once 
-#include <cstdlib>
+#include <random>
+#include <Eigen/Dense>
 
 class Target{
 public:
@@ -9,11 +10,14 @@ public:
 
     // targets are seeded with score so that they have the same random position based on score
     Target(int score, int windowWidth , int windowHeight){
-        srand(score); 
+        std::mt19937 rng(score);
+        std::uniform_real_distribution<float> distX(windowWidth * 0.1f, windowWidth * 0.9f);
+        std::uniform_real_distribution<float> distY(windowHeight * 0.1f, windowHeight * 0.9f);
+
         
         // we want the target to be within the visible area 
-        pos(0) = windowWidth*.1f + (rand() % ((int)(windowWidth*.9f) - (int)(windowWidth*.1f  + 1)));
-        pos(1)= windowHeight*.1f + (rand() % ((int)(windowHeight*.9f) - (int)(windowHeight*.1f )+ 1));
+        pos(0) = distX(rng); 
+        pos(1)= distY(rng); 
         
     }
 }; 

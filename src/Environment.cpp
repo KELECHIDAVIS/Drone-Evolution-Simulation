@@ -3,14 +3,18 @@
 // updates the rocket and checks if it collided with the target
 void Environment::update(float deltaTime){
     rocket.update(deltaTime); 
-    checkCollision(); 
+
+    if( checkCollision()){ 
+        score++; 
+        target = Target(score, windowWidth, windowHeight); 
+    }
 }
 
 //CAN FURTHER OPTIMIZE THIS 
 // ONLY CHECK COLLISION IF THEy ARE CLOSE (euclidean distance is is <= diameter of target + height of rocket)
 // SAT between 
 //USING LINEAR ALG TO MAKE FAST
-void Environment::checkCollision()
+bool Environment::checkCollision()
 {
     // first make sure they are close enough to check 
     float dx = target.pos(0) - rocket.pos(0); 
@@ -19,10 +23,12 @@ void Environment::checkCollision()
     float dist = sqrt(dx*dx +dy*dy); 
 
     if(dist <= target.radius*2+ rocket.height)
-        return; 
+        return false ; 
     
     // else check intersection
     bool intersection = separateAxis(); 
+
+    return intersection; 
 }
 
 bool Environment::separateAxis(){
@@ -48,8 +54,37 @@ bool Environment::separateAxis(){
 
     // for each axis, project and check if they are gaps 
     for (Eigen::Vector2f n : axes){
+        // project each vertice on the line 
+        // then get the max and min mag on that line 
+        float max= INT_MIN , min = INT_MAX; 
+        for (int i =0 ; i< 3; i++ ){
+            Eigen::Vector2f proj = projection(n, vertices.col(i)); // MIGHT HAVE TO NORMALIZE IF DOESN'T WORK 
+            float norm = proj.norm(); 
+            max= std::max(max,norm); 
+            min= std::min(min,norm); 
+        }
         
+        // find circle's  
+        Eigen::Vector2f proj = projection(n, target.pos); 
+        float norm = proj.norm(); 
+        // subtract and add radius for it's max and min 
+        float circleMax = target.radius +norm; 
+        float circleMin = -target.radius + norm ; 
+    
+        // check for collision on this axis 
+        if(max < circleMin){
+            return false; // gap
+        }else if (min > circleMax){
+            return false; 
+        }// else they are touching on this axis 
     }
 
     return true; 
+}
+// return the projection of a onto n 
+Eigen::Vector2f Environment::projection(Eigen::Vector2f n, Eigen::Vector2f a)
+{
+    float dotProduct= a.dot(n); 
+    float denom = n.dot(n); 
+    return (dotProduct/denom) * n ;
 }

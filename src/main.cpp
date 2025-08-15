@@ -1,4 +1,4 @@
-#include "RocketVisual.hpp"
+#include "EnvironmentVisual.hpp"
 #include <iostream>
 
 int main()
@@ -8,9 +8,9 @@ int main()
     sf::RenderWindow window = sf::RenderWindow(sf::VideoMode({1920, 1080}), "Drone Evo");
     window.setFramerateLimit(144);
     
-    Rocket rocket(950,540); 
-    RocketVisual rv(rocket); 
-    rv.setThrust(1.0f);
+    // init env
+    Environment env (window.getSize().x, window.getSize().y); 
+    EnvironmentVisual envVis(env.rocket, env.target, env); 
 
     sf::Clock clock; 
     while (window.isOpen())
@@ -26,21 +26,22 @@ int main()
                     window.close();
 
                 if(keyPressed->scancode == sf::Keyboard::Scancode::A){
-                    rv.rotate(15); 
+                    
                 }
                 if(keyPressed->scancode == sf::Keyboard::Scancode::D){
-                    rv.rotate(-15); 
+                    
                 }
             }
         }
 
         // update 
         float deltaTime = clock.restart().asSeconds(); 
-        //rocket.update(deltaTime); 
+        env.update(deltaTime); 
 
         window.clear();
+        
         // draw
-        rv.draw(window); 
+        envVis.draw(window); 
         window.display();
     }
 }
