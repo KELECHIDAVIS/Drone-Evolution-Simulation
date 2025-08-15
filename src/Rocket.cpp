@@ -66,12 +66,23 @@ void Rocket::setRotation(int r) {
 
 // --- Thrust ---
 float Rocket::getThrust() const { return thrust; }
-void Rocket::setThrust(float t) {
+
+Eigen::Matrix<float, 2, 3> Rocket::getVertices()
+{
+    // create rotation matrix 
+    float cosTheta = cos(degToRad(rotation));  
+    float sinTheta= sin(degToRad(rotation));  
+    Eigen::Matrix2f R {
+        {cosTheta, -sinTheta},
+        {sinTheta, cosTheta},
+    }; 
+    Eigen::Matrix<float, 2,3> vWorld = R*vLocal;
+    vWorld.colwise() += pos; // translate to world pos 
+    return vWorld; 
+}
+void Rocket::setThrust(float t)
+{
     if(t < 0.0f) thrust = 0.0f;
     else if(t > 1.0f) thrust = 1.0f;
     else thrust = t;
 }
-
-
-
-

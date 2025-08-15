@@ -7,13 +7,13 @@ public:
     const float mass = 1;  
     const float base = 40; 
     const float height = 70; 
-    int rotation=180; // 0-360 , should point upwards initially 
+    int rotation=0; // 0-360 , start at 0
     float thrust=0.0f; // 0-1
     
 
     //vectors will be stored using eigen
-    Eigen::Vector2d pos; 
-    Eigen::Vector2d vel;  
+    Eigen::Vector2f pos; 
+    Eigen::Vector2f vel;  
 
     static constexpr float GRAVITY = 30; 
     static constexpr float MAX_THRUST = 150; 
@@ -37,9 +37,16 @@ public:
     int getRotation() const;
     float getThrust() const;
     
+    // returns postitions rockets vertices as a mat of 3 row vectors CCW 
+    Eigen::Matrix<float, 2,3> getVertices(); 
     
     // Setters
     void setRotation(int r);
     void setThrust(float t);
     
+
+    Eigen::Matrix<float, 2, 3> vLocal{
+        {height/2.0f, -height/2.0f, -height/2.0f},
+        {0, -base/2.0f, base/2.0f}
+    }; // local vertice calcs for triangle, private so don't recalc everytime 
 };
