@@ -16,7 +16,7 @@ public:
     Eigen::Vector2f vel;  
 
     static constexpr float GRAVITY = 30; //350; 
-    static constexpr float MAX_THRUST =180; // 700; 
+    static constexpr float MAX_THRUST =180;// 700; 
     
     Rocket(float x, float y ){
         pos<<x , y; 
@@ -47,6 +47,6 @@ public:
 
     Eigen::Matrix<float, 2, 3> vLocal{
         {height/2.0f, -height/2.0f, -height/2.0f},
-        {0, -base/2.0f, base/2.0f}
+        {0, base/2.0f, -base/2.0f}
     }; // local vertice calcs for triangle, private so don't recalc everytime 
 };

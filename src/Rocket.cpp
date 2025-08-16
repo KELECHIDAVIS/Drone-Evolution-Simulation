@@ -67,17 +67,22 @@ void Rocket::setRotation(int r) {
 // --- Thrust ---
 float Rocket::getThrust() const { return thrust; }
 
+
+// RETURNS SFML COORDINATES FOR VERTICES 
 Eigen::Matrix<float, 2, 3> Rocket::getVertices()
 {
     // create rotation matrix 
     float cosTheta = cos(degToRad(rotation));  
     float sinTheta= sin(degToRad(rotation));  
     Eigen::Matrix2f R {
-        {cosTheta, -sinTheta},
-        {sinTheta, cosTheta},
+        {cosTheta, sinTheta},
+        {-sinTheta, cosTheta},
     }; 
     Eigen::Matrix<float, 2,3> vWorld = R*vLocal;
     vWorld.colwise() += pos; // translate to world pos 
+
+    // flip for sfml 
+    vWorld.row(1) = -vWorld.row(1);
     return vWorld; 
 }
 void Rocket::setThrust(float t)
