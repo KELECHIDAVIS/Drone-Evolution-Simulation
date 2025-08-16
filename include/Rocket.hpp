@@ -44,7 +44,7 @@ public:
     void setRotation(int r);
     void setThrust(float t);
     
-
+    // for triangle starting at 0 deg; CCW
     Eigen::Matrix<float, 2, 3> vLocal{
         {height/2.0f, -height/2.0f, -height/2.0f},
         {0, base/2.0f, -base/2.0f}

@@ -22,26 +22,25 @@ void Rocket::update(float deltaTime)
 
     // Thrust in direction of rocket
     float a_thrust_x = (thrustForce * cos(angleRad)) / mass;
-    float a_thrust_y = (thrustForce * sin(angleRad)) / mass;
+    float a_thrust_y = (thrustForce * sin(angleRad) ) / mass;
 
-    // Gravity only along y
-    float a_gravity_y = -GRAVITY;  // positive up in math coordinates
 
     // Total acceleration
     float a_x = a_thrust_x;
-    float a_y = a_thrust_y + a_gravity_y;
+    float a_y = a_thrust_y -GRAVITY; // gravity is alr in accel
 
     // calc final vels  
-    float v_f_y = vel(1) +a_y*deltaTime; 
     float v_f_x = vel(0) +a_x*deltaTime;
+    float v_f_y = vel(1) +a_y*deltaTime; 
     
     // calc final positions
     pos(0)+= (v_f_x + vel(0))*deltaTime/2.0; 
     pos(1) += (v_f_y + vel(1))*deltaTime/2.0; 
 
     // set init vels to finals 
-    vel(1)= v_f_y;
     vel(0) = v_f_x; 
+    vel(1)= v_f_y;
+    
 }
 
 // SHOULD BE IN MATH DEGS NOT SFML
@@ -75,14 +74,14 @@ Eigen::Matrix<float, 2, 3> Rocket::getVertices()
     float cosTheta = cos(degToRad(rotation));  
     float sinTheta= sin(degToRad(rotation));  
     Eigen::Matrix2f R {
-        {cosTheta, sinTheta},
-        {-sinTheta, cosTheta},
+        {cosTheta, -sinTheta},
+        {sinTheta, cosTheta},
     }; 
     Eigen::Matrix<float, 2,3> vWorld = R*vLocal;
     vWorld.colwise() += pos; // translate to world pos 
 
-    // flip for sfml 
-    vWorld.row(1) = -vWorld.row(1);
+    // // flip for sfml 
+    // vWorld.row(1) = -vWorld.row(1);
     return vWorld; 
 }
 void Rocket::setThrust(float t)

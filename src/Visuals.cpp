@@ -1,5 +1,7 @@
 #include "EnvironmentVisual.hpp"
 
+// *** FOR ALL DRAWING FUNCTIONS TRANSFER FROM MATH TO SFML COORDINATES ******
+
 // rocket visuals
 void RocketVisual::draw(sf::RenderWindow &window){
     // SINCE AXISES ARE FLIPPED IN SFML DRAWING IT WITH THIS IS MIND SO THAT MATH IS NORMAL
@@ -21,7 +23,8 @@ Rocket& RocketVisual::getRocket(){
 // target implementation
 
 void TargetVisual::draw(sf::RenderWindow& window) {
-    shape.setPosition(sf::Vector2f(target.pos(0), target.pos(1)));
+    // SINCE AXISES ARE FLIPPED IN SFML DRAWING IT WITH THIS IS MIND SO THAT MATH IS NORMAL
+    shape.setPosition(sf::Vector2f(target.pos(0), window.getSize().y - target.pos(1)));
     window.draw(shape);
 }
 

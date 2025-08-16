@@ -16,9 +16,9 @@ int main()
     // vertex checkers for testing 
     sf::CircleShape checkers[3]; 
     for(int i =0; i<3; i++){
-        checkers[i] = sf::CircleShape(10);
+        checkers[i] = sf::CircleShape(4);
         checkers[i].setFillColor(sf::Color::Green); 
-        checkers[i].setOrigin(sf::Vector2f(5,5));  
+        checkers[i].setOrigin(sf::Vector2f(2,2));  
     } 
     sf::Clock clock; 
     while (window.isOpen())
@@ -55,7 +55,7 @@ int main()
         // update checkers 
         Eigen::Matrix<float, 2,3> verts  = env.getRocketVertices(); 
         for (int i = 0; i< 3 ; i++){
-            checkers[i].setPosition(sf::Vector2f(verts.col(i)(0), verts.col(i)(1))); 
+            checkers[i].setPosition(sf::Vector2f(verts.col(i)(0), window.getSize().y - verts.col(i)(1))); 
         }
         window.clear();
         
