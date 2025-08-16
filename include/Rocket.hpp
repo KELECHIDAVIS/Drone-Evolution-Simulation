@@ -15,8 +15,8 @@ public:
     Eigen::Vector2f pos; 
     Eigen::Vector2f vel;  
 
-    static constexpr float GRAVITY = 30; 
-    static constexpr float MAX_THRUST = 150; 
+    static constexpr float GRAVITY = 30; //350; 
+    static constexpr float MAX_THRUST =180; // 700; 
     
     Rocket(float x, float y ){
         pos<<x , y; 

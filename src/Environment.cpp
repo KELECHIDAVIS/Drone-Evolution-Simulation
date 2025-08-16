@@ -22,13 +22,35 @@ bool Environment::checkCollision()
     
     float dist = sqrt(dx*dx +dy*dy); 
 
-    if(dist <= target.radius*2+ rocket.height)
-        return false ; 
+    float rocketRadius = std::sqrt(
+        (rocket.base / 2.f) * (rocket.base / 2.f) +
+        (rocket.height / 2.f) * (rocket.height / 2.f)
+    );
+
+    if (dist > target.radius + rocketRadius)
+        return false; // No way they're touching
+    
+
     
     // else check intersection
     bool intersection = separateAxis(); 
 
     return intersection; 
+}
+
+void Environment::addThrust(float thrust)
+{
+    rocket.setThrust (thrust+rocket.getThrust())    ; 
+}
+
+void Environment::rotate(float deg)
+{
+    rocket.setRotation(rocket.getRotation()+deg); 
+}
+
+Eigen::Matrix<float, 2, 3> Environment::getRocketVertices()
+{
+    return rocket.getVertices();
 }
 
 bool Environment::separateAxis(){

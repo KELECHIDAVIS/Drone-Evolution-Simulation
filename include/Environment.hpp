@@ -19,5 +19,8 @@ public:
     bool separateAxis(); 
     Eigen::Vector2f projection(Eigen::Vector2f n, Eigen::Vector2f a ); 
     bool checkCollision(); 
+    void addThrust(float thrust);
+    void rotate(float deg);  
+    Eigen::Matrix<float, 2,3> getRocketVertices(); 
 
 }; 
