@@ -13,13 +13,7 @@ int main()
     EnvironmentVisual envVis(env.rocket, env.target, env); 
     env.addThrust(.3333); 
 
-    // vertex checkers for testing 
-    sf::CircleShape checkers[3]; 
-    for(int i =0; i<3; i++){
-        checkers[i] = sf::CircleShape(4);
-        checkers[i].setFillColor(sf::Color::Green); 
-        checkers[i].setOrigin(sf::Vector2f(2,2));  
-    } 
+    
     sf::Clock clock; 
     while (window.isOpen())
     {
@@ -52,18 +46,12 @@ int main()
         float deltaTime = clock.restart().asSeconds(); 
         env.update(deltaTime); 
 
-        // update checkers 
-        Eigen::Matrix<float, 2,3> verts  = env.getRocketVertices(); 
-        for (int i = 0; i< 3 ; i++){
-            checkers[i].setPosition(sf::Vector2f(verts.col(i)(0), window.getSize().y - verts.col(i)(1))); 
-        }
+        
         window.clear();
         
         // draw
         envVis.draw(window); 
-        for (int i = 0; i< 3 ; i++){
-            window.draw(checkers[i]); 
-        }
+        
         window.display();
     }
 }
