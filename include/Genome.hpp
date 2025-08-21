@@ -1,7 +1,9 @@
+#pragma once 
 #include <vector> 
 // genomes are the blueprint for creating a network 
 enum NodeType{
     INPUT,
+    BIAS,
     OUTPUT,
     HIDDEN
 }; 
