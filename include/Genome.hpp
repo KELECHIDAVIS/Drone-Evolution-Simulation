@@ -24,7 +24,7 @@ struct Connection{
 struct Genome{
     std::vector<Node> nodes ; 
     std::vector<Connection> connections; 
-    double fitness = 0.0; // set after evaluation ; higher is better 
+    double fitness = 0.0; // set after evaluation ; higher is better  
 
     void addNode(int id, NodeType type){
         nodes.emplace_back(Node(id , type)); 
