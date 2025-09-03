@@ -1,1 +1,5 @@
 how I want the sim to work: 
+    n agents are initialized with their own nns 
+    each agent uses their nn to make their decision every frame 
+    their fitness is updated based on this 
+    when the last agent dies, crossover and mutate new agents and restart loop 

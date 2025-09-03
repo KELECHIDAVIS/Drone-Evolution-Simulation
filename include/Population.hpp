@@ -1,1 +1,1 @@
-// how i want the simulation to work
+//group of agents 
