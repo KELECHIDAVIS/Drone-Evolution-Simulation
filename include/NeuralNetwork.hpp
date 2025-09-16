@@ -3,8 +3,8 @@
 #include <Eigen/Dense>
 #include <vector> 
 #include <stack>
-#include <set> 
-
+#include <unordered_set> 
+#include <iostream> 
 
 // this is the phenotype that is based off the inputted genome 
 //CURRENTLY IS BASED ON A TOPLOGICAL/GRAPHICAL REPRESENTATION.  
@@ -35,16 +35,30 @@ public:
 
         // through topological sort, get the order of the evaluation of this genome 
         // add all inputs to stack, loop will finish when it is empty
-        std::set<int> visited; 
+        std::unordered_set<int> visited; 
+        std::cout<<"Starting Topological Sort: "<<std::endl; 
         while (!nodeStack.empty()){
             int currNode = nodeStack.top();
 
             // if doesn't have any non-visited neighbors then visit, add to eval order, and pop
-           
-
+            if (adjList[currNode].empty()){
+                visited.insert(currNode); 
+                evalOrder.insert(evalOrder.begin(), currNode); // add to front
+                nodeStack.pop(); 
+                std::cout<<currNode<<std::endl; 
+            }else{ // add neighbors to the stack 
+                for (int node : adjList[currNode]){
+                    nodeStack.push(node); 
+                }
+            }
+        }
+        // eval order 
+        for (int node : evalOrder){
+            std::cout<< node <<" "; 
+        }
     }
 
     Eigen::VectorXd feedForward(Eigen::VectorXd input ){ // get output based on input, input dim should match up 
-
+        
     }; 
 }; 
