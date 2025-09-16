@@ -35,15 +35,12 @@ public:
 
         // through topological sort, get the order of the evaluation of this genome 
         // add all inputs to stack, loop will finish when it is empty
-        // std::set<int> visited; 
-        // while (!nodeStack.empty()){
-        //     int currNode = nodeStack.top(); 
-        //     visited.insert(currNode); // current node is visited 
-        //     // get curr node's neighbors, if no neighbors add to evalOrder
-        //     if(adjList[currNode].size() ==0){
+        std::set<int> visited; 
+        while (!nodeStack.empty()){
+            int currNode = nodeStack.top();
 
-        //     }
-        // }
+            // if doesn't have any non-visited neighbors then visit, add to eval order, and pop
+           
 
     }
 
