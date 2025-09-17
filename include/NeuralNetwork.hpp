@@ -15,16 +15,26 @@ class NeuralNetwork{
     std::unordered_map<int, std::vector<Connection>> incomingConnections; // to keep track of what nodes to pull input from when calculating this nodes output 
 
 public:
+    
+    void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, std::vector<int>> &adjList, std::vector<int> &evalOrder){
+        
+        // if no children (output node ), mark visited and add to eval 
+        if(adjList.find(currNode) == adjList.end() )
+            adjList[currNode] ; // make empty list for no children 
+            
+        for (int child : adjList[currNode]){
+            if (visited.find(child) == visited.end()) // only add unvisited children 
+                dfs(child, visited, adjList, evalOrder); 
+        }
+        visited.insert(currNode); 
+        evalOrder.push_back(currNode); 
+        
+    }
     NeuralNetwork(Genome genome){ 
         
-        //TODO: the initial stack has hidden in it to should only have inputs in there 
-        std::stack<int> nodeStack; // for traversal 
-        std::cout<<"Initial Stack Contents: "<<std::endl;
+        
         for(Node node : genome.nodes){
             nodeTypes[node.id] = node.type; 
-            if(node.type == NodeType::INPUT || node.type == NodeType::BIAS)
-                nodeStack.push(node.id); //start traversing at the inputs
-                std::cout<<node.id<<" "; 
         }
         
         
@@ -37,29 +47,26 @@ public:
             }   
         }
 
-        // through topological sort, get the order of the evaluation of this genome 
-        // add all inputs to stack, loop will finish when it is empty
-        std::unordered_set<int> visited; 
-        std::cout<<"Starting Topological Sort: "<<std::endl; 
-        while (!nodeStack.empty()){
-            int currNode = nodeStack.top();
-            
-            // if doesn't have any non-visited neighbors then visit, add to eval order, and pop
-            if (adjList[currNode].empty()){
-                visited.insert(currNode); 
-                evalOrder.insert(evalOrder.begin(), currNode); // add to front
-                nodeStack.pop(); 
-                std::cout<<currNode<<std::endl; 
-            }else{ // add neighbors to the stack 
-                for (int node : adjList[currNode]){
-                    // if the current node is in visited set, skip
-                    auto it = visited.find(node); 
-                    
-                    if(it == visited.end())
-                        nodeStack.push(node); 
-                }
+        //TODO: remove print adj list (testing)
+        std::cout<<"\nPrinting adj list: "<<std::endl; 
+        for (auto node : adjList ){
+            std::cout<<node.first<< ": [ "; 
+            for (int neighbor: node.second){
+                std::cout<<neighbor<<" "; 
             }
+            std::cout<<"]"<<std::endl; 
         }
+
+        // through topological sort, get the order of node evaluation of this genome 
+        std::unordered_set<int> visited; 
+        std::cout<<"\nTopological Sort Result: "<<std::endl; 
+        for ( Node node : genome.nodes){
+            if(visited.find(node.id) == visited.end())
+                dfs(node.id, visited, adjList, evalOrder); 
+        }
+
+        // reverse the eval order 
+        std::reverse(evalOrder.begin(), evalOrder.end()); 
         // eval order 
         for (int node : evalOrder){
             std::cout<< node <<" "; 

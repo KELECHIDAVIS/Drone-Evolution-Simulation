@@ -40,7 +40,7 @@ int main (){
     std::cout<<"\nConnections: " <<std::endl;
     for(Connection conn : genome.connections){
         std::cout<<conn.inId << "->"<<conn.outId<<"\t w = "<<conn.weight<<"\t"
-        << (conn.isEnabled ? "enabled" : "disabled") <<"\t innv: "<< conn.innvNum <<std::endl; 
+        << (conn.isEnabled ? "enabled" : "disabled") <<"\t"<<"innv: "<< conn.innvNum <<std::endl; 
     } 
 
     NeuralNetwork network(genome); 
