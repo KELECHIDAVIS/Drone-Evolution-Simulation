@@ -17,13 +17,17 @@ class NeuralNetwork{
 public:
     NeuralNetwork(Genome genome){ 
         
+        //TODO: the initial stack has hidden in it to should only have inputs in there 
         std::stack<int> nodeStack; // for traversal 
+        std::cout<<"Initial Stack Contents: "<<std::endl;
         for(Node node : genome.nodes){
             nodeTypes[node.id] = node.type; 
             if(node.type == NodeType::INPUT || node.type == NodeType::BIAS)
                 nodeStack.push(node.id); //start traversing at the inputs
+                std::cout<<node.id<<" "; 
         }
-
+        
+        
         std::unordered_map<int , std::vector<int>> adjList; // since dag, the adjList will list out the outgoing connections 
         
         for(Connection conn : genome.connections){ // get each nodes incoming connections as well as just building and adj list 
@@ -39,7 +43,7 @@ public:
         std::cout<<"Starting Topological Sort: "<<std::endl; 
         while (!nodeStack.empty()){
             int currNode = nodeStack.top();
-
+            
             // if doesn't have any non-visited neighbors then visit, add to eval order, and pop
             if (adjList[currNode].empty()){
                 visited.insert(currNode); 
@@ -48,7 +52,11 @@ public:
                 std::cout<<currNode<<std::endl; 
             }else{ // add neighbors to the stack 
                 for (int node : adjList[currNode]){
-                    nodeStack.push(node); 
+                    // if the current node is in visited set, skip
+                    auto it = visited.find(node); 
+                    
+                    if(it == visited.end())
+                        nodeStack.push(node); 
                 }
             }
         }

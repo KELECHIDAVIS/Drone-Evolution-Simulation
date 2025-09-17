@@ -1,6 +1,6 @@
 #include "EnvironmentVisual.hpp"
 #include <iostream>
-#include "Genome.hpp"
+#include "NeuralNetwork.hpp"
 #include "helper.hpp"
 // testing genomes and neural networks 
 int main (){
@@ -37,12 +37,13 @@ int main (){
     for(Node node: genome.nodes){
         std::cout<< node.id << ":"<< (NodeType) node.type<<", "; 
     }
-    std::cout<<"Connections: " <<std::endl;
+    std::cout<<"\nConnections: " <<std::endl;
     for(Connection conn : genome.connections){
         std::cout<<conn.inId << "->"<<conn.outId<<"\t w = "<<conn.weight<<"\t"
         << (conn.isEnabled ? "enabled" : "disabled") <<"\t innv: "<< conn.innvNum <<std::endl; 
     } 
 
+    NeuralNetwork network(genome); 
     return 0 ; 
 }
 
