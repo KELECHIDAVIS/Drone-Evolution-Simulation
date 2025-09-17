@@ -16,7 +16,8 @@ class NeuralNetwork{
 
 public:
     
-    void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, std::vector<int>> &adjList, std::vector<int> &evalOrder){
+    void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, 
+        std::vector<int>> &adjList, std::vector<int> &evalOrder){
         
         // if no children (output node ), mark visited and add to eval 
         if(adjList.find(currNode) == adjList.end() )
@@ -47,19 +48,8 @@ public:
             }   
         }
 
-        //TODO: remove print adj list (testing)
-        std::cout<<"\nPrinting adj list: "<<std::endl; 
-        for (auto node : adjList ){
-            std::cout<<node.first<< ": [ "; 
-            for (int neighbor: node.second){
-                std::cout<<neighbor<<" "; 
-            }
-            std::cout<<"]"<<std::endl; 
-        }
-
         // through topological sort, get the order of node evaluation of this genome 
         std::unordered_set<int> visited; 
-        std::cout<<"\nTopological Sort Result: "<<std::endl; 
         for ( Node node : genome.nodes){
             if(visited.find(node.id) == visited.end())
                 dfs(node.id, visited, adjList, evalOrder); 
@@ -67,13 +57,44 @@ public:
 
         // reverse the eval order 
         std::reverse(evalOrder.begin(), evalOrder.end()); 
-        // eval order 
-        for (int node : evalOrder){
-            std::cout<< node <<" "; 
+        
+    }
+
+    
+    Eigen::VectorXd feedForward(Eigen::VectorXd input ){ // get output based on input, input dim should match up 
+        // iterate through eval order and store the value of the calc based on the type of node
+        std::unordered_map<int, double> values; 
+        // set input vals 
+        for( int nodeID : evalOrder)    {
+            if(nodeTypes[nodeID] == NodeType::INPUT){
+                values[nodeID] = input(nodeID);  // because input nodes r first created can set as index as well
+            }else if (nodeTypes[nodeID] == NodeType::INPUT){
+                values[nodeID] = 1.0; 
+            }else{ // output or hidden that will be computed later 
+                values[nodeID] = 0.0; 
+            }
+        }
+
+        // now iterate through eval order again using incoming connections to get the weight sum at each node 
+        for (int nodeID : evalOrder){
+            if (nodeTypes[nodeID] == NodeType::INPUT || nodeTypes[nodeID] == NodeType::BIAS)   
+                continue; // skip if input 
+
+            double sum = 0; 
+            // for each incoming connection, add the weighted sum 
+            for (Connection conn : incomingConnections[nodeID]){
+                sum+= conn.weight * values[conn.inId]; 
+            }
+
+            // apply activation and set value of node 
+            sum = steepenedSigmoid(sum); 
+
+            values[nodeID] =sum ; 
         }
     }
 
-    Eigen::VectorXd feedForward(Eigen::VectorXd input ){ // get output based on input, input dim should match up 
-        
-    }; 
+    double steepenedSigmoid(double x){
+        return 1.0 / (1 + exp(-4.9*x)); 
+    }
+
 }; 
