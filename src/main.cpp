@@ -37,7 +37,12 @@ int main (){
     for(Node node: genome.nodes){
         std::cout<< node.id << ":"<< (NodeType) node.type<<", "; 
     }
-    std::cout<<"Connections: " <<std::endl; 
+    std::cout<<"Connections: " <<std::endl;
+    for(Connection conn : genome.connections){
+        std::cout<<conn.inId << "->"<<conn.outId<<"\t w = "<<conn.weight<<"\t"
+        << (conn.isEnabled ? "enabled" : "disabled") <<"\t innv: "<< conn.innvNum <<std::endl; 
+    } 
+
     return 0 ; 
 }
 
