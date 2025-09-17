@@ -1,0 +1,29 @@
+Nodes:  0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:1, 7:1, 8:2, 
+Connections:
+0->6     w = -1.99499   enabled  innv: 0
+0->7     w = 0.254341   enabled  innv: 1
+1->6     w = -1.22678   enabled  innv: 2
+1->7     w = 1.23496    enabled  innv: 3
+2->6     w = 0.340037   enabled  innv: 4
+2->7     w = -0.0805078 enabled  innv: 5
+3->6     w = -0.598834  enabled  innv: 6
+3->7     w = 1.58385    enabled  innv: 7
+4->6     w = 1.29136    enabled  innv: 8
+4->7     w = 0.986419   enabled  innv: 9
+5->6     w = -1.30357   enabled  innv: 10
+5->7     w = 1.43577    disabled         innv: 11
+5->8     w = 0.842006   enabled  innv: 12
+8->7     w = 0.0541398  enabled  innv: 13
+Initial Stack Contents:
+
+Printing adj list:
+8: [ 7 ]
+5: [ 6 8 ]
+4: [ 6 7 ]
+3: [ 6 7 ]
+2: [ 6 7 ]
+1: [ 6 7 ]
+0: [ 6 7 ]
+
+Topological Sort Result:
+5 8 4 3 2 1 0 7 6
