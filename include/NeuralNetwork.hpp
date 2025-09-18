@@ -74,7 +74,7 @@ public:
         for( int nodeID : evalOrder)    {
             if(nodeTypes[nodeID] == NodeType::INPUT){
                 values[nodeID] = input(nodeID);  // because input nodes r first created can set as index as well
-            }else if (nodeTypes[nodeID] == NodeType::INPUT){
+            }else if (nodeTypes[nodeID] == NodeType::BIAS){
                 values[nodeID] = 1.0; 
             }else{ // output or hidden that will be computed later 
                 values[nodeID] = 0.0; 
