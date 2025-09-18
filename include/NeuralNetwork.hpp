@@ -13,7 +13,7 @@ class NeuralNetwork{
     std::vector<int> evalOrder; // order nodes should be calculated in 
     std::unordered_map<int, NodeType> nodeTypes; // for quick type checking 
     std::unordered_map<int, std::vector<Connection>> incomingConnections; // to keep track of what nodes to pull input from when calculating this nodes output 
-
+    std::vector<int> outputNodeIds;
 public:
     
     void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, 
@@ -36,6 +36,9 @@ public:
         
         for(Node node : genome.nodes){
             nodeTypes[node.id] = node.type; 
+            if (node.type == NodeType::OUTPUT) {
+                outputNodeIds.push_back(node.id);
+            }
         }
         
         
@@ -57,6 +60,9 @@ public:
 
         // reverse the eval order 
         std::reverse(evalOrder.begin(), evalOrder.end()); 
+        
+        // Make sure outputs are in ascending order of ID (if that matches your convention)
+        std::sort(outputNodeIds.begin(), outputNodeIds.end());
         
     }
 
@@ -91,6 +97,14 @@ public:
 
             values[nodeID] =sum ; 
         }
+
+        // now convert the values output output vector 
+        // Build clean Eigen vector of outputs
+        Eigen::VectorXd output(outputNodeIds.size());
+        for (size_t i = 0; i < outputNodeIds.size(); ++i) {
+            output(i) = values[outputNodeIds[i]];
+        }
+        return output;
     }
 
     double steepenedSigmoid(double x){
