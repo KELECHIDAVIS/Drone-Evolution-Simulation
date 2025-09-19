@@ -1,5 +1,8 @@
-how I want the sim to work: 
-    n agents are initialized with their own nns 
-    each agent uses their nn to make their decision every frame 
-    their fitness is updated based on this 
-    when the last agent dies, crossover and mutate new agents and restart loop 
+ideas:
+show the different species throughout the simulation
+the window is going to be broken up into three sections:
+the network of the most fit individual
+the playback of the most fit individual's simulation
+a showing of all the different species * like the visually explained video
+
+I could also let all the species play in the background, collect data, then replay it on screen
