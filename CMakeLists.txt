@@ -54,3 +54,24 @@ target_link_libraries(DroneEvo PRIVATE SFML::Graphics)
 
 # Link Eigen (header-only) — this exposes include dirs
 target_link_libraries(DroneEvo PRIVATE Eigen3::Eigen)
+
+
+# -------------------------------
+# Testing setup 
+# -------------------------------
+include(CTest) 
+enable_testing()
+
+# Grab all test source files in tests/
+file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
+    tests/*.cpp
+)
+
+# Build a separate executable for each test file
+foreach(test_source ${TEST_SOURCES})
+    get_filename_component(test_name ${test_source} NAME_WE)
+    add_executable(${test_name} ${test_source})
+    target_include_directories(${test_name} PRIVATE include)
+    target_link_libraries(${test_name} PRIVATE Eigen3::Eigen SFML::Graphics)
+    add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach()

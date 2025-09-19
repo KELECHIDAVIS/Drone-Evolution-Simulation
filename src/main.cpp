@@ -45,7 +45,7 @@ void testHiddenNode() {
     genome.addConnection(0, 2, 1.0, true, 0);
     genome.addConnection(1, 2, 1.0, true, 1);
     genome.addConnection(2, 3, 1.0, true, 2);
-
+ 
     NeuralNetwork net(genome);
 
     Eigen::VectorXd input(2);

@@ -31,6 +31,7 @@ public:
         evalOrder.push_back(currNode); 
         
     }
+    NeuralNetwork(){}; 
     NeuralNetwork(Genome genome){ 
         
         
@@ -109,6 +110,10 @@ public:
 
     double steepenedSigmoid(double x){
         return 1.0 / (1 + exp(-4.9*x)); 
+    }
+
+    int numOutputs(){
+        return outputNodeIds.size(); 
     }
 
 }; 
