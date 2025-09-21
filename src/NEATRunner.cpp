@@ -2,36 +2,67 @@
 
 NEATRunner::NEATRunner()
 {
+    for (int i =0; i< POP_SIZE; i++){
+        Genome genome = initGenome(); 
+        genomes.push_back(genome); 
+
+        // init their neural networks
+        NeuralNetwork network(genome); 
+        networks.push_back(network); 
+
+        // init their environments 
+        Environment env(ENV_WIDTH, ENV_HEIGHT); 
+        environments.push_back(env); 
+    }
+
+    
 }
 
-Genome NEATRunner::initGenome()
+Genome NEATRunner::initGenome() 
 {
     Genome genome ; 
     
-    genome.addNode(NodeType::INPUT); 
-    genome.addNode(NodeType::INPUT); 
-    genome.addNode(NodeType::INPUT); 
-    genome.addNode(NodeType::INPUT); 
-    genome.addNode(NodeType::INPUT); 
-    genome.addNode(NodeType::INPUT); 
-    genome.addNode(NodeType::OUTPUT); 
-    genome.addNode(NodeType::OUTPUT); 
+    genome.addNode(NodeType::INPUT); // 0 
+    genome.addNode(NodeType::INPUT); // 1 
+    genome.addNode(NodeType::INPUT); //2
+    genome.addNode(NodeType::INPUT); //3
+    genome.addNode(NodeType::INPUT); //4
+    genome.addNode(NodeType::INPUT); //5
+    genome.addNode(NodeType::OUTPUT); //6
+    genome.addNode(NodeType::OUTPUT); //7
 
-    // every time a new connection is added make sure that it increments the global innovation number if it hasn't been made b4
-    genome.addConnection(0,6,getRandNum(-2,2), true,0); 
-    genome.addConnection(0,7,getRandNum(-2,2), true,1); 
-    genome.addConnection(1,6,getRandNum(-2,2), true,2); 
-    genome.addConnection(1,7,getRandNum(-2,2), true,3); 
-    genome.addConnection(2,6,getRandNum(-2,2), true,4); 
-    genome.addConnection(2,7,getRandNum(-2,2), true,5); 
-    genome.addConnection(3,6,getRandNum(-2,2), true,6); 
-    genome.addConnection(3,7,getRandNum(-2,2), true,7); 
-    genome.addConnection(4,6,getRandNum(-2,2), true,8); 
-    genome.addConnection(4,7,getRandNum(-2,2), true,9); 
-    genome.addConnection(5,6,getRandNum(-2,2), true,10); 
-    genome.addConnection(5,7,getRandNum(-2,2), false,11); 
-    genome.addConnection(5,8,getRandNum(-2,2), true,12); 
-    genome.addConnection(8,7,getRandNum(-2,2), true,13); 
+    // Fully connect all inputs [0..5] to all outputs [6..7]
+    for (int in = 0; in <= 5; ++in) {
+        for (int out = 6; out <= 7; ++out) {
+        createConnection(in, out, getRandNum(-1, 1), true, genome);
+    }
+}
 
     return genome; 
+}
+
+void NEATRunner::createConnection(int in, int out, double weight, bool enabled, Genome &genome)
+{
+    // if this connection alr exists just pull the innovation number 
+    // otherwise store the current innv num, set connections innv num, then increment global num
+    int innvNum ; 
+    if (innvTracker.find({in, out})!=innvTracker.end()){
+        innvNum = innvTracker[{in, out}]; 
+    }else{
+        innvTracker[{in, out}] = globalInnvNum; 
+        innvNum = globalInnvNum; 
+        globalInnvNum++;  
+    }
+    genome.addConnection(in, out, weight, enabled, innvNum); 
+}
+
+void NEATRunner::runGeneration()
+{
+    speciate(); 
+
+    mutate(); 
+
+    crossover(); 
+
+    testOutGenomes(); 
 }

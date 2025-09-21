@@ -4,6 +4,7 @@
 #include "helper.hpp"
 class NEATRunner{
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
+    static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static const float C1, C2, C3, COMP_THRESHOLD; // TODO: all hyperparams are subject to change 
     int globalInnvNum=0;
 
@@ -38,6 +39,7 @@ public:
     void mutate(); 
 
     /*crossover: 
+    FOR EACH NEW CONNECTION UPDATE GLOBAL INNOVATION NUM
     There is a 75% chance that and a gene will be disabled if it was disabled in either parent
     Interspecies mating rate is .001
     For smaller populations: 
@@ -53,4 +55,10 @@ public:
     void testOutGenomes(); 
 
     Genome initGenome(); 
+
+    // creates a connection on a genome and adheres with the innovation tracker
+    void createConnection(int in, int out , double weight, bool enabled, Genome &genome); 
+
+
+    void runGeneration(); 
 }; 
