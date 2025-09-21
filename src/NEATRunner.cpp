@@ -65,4 +65,19 @@ void NEATRunner::runGeneration()
     crossover(); 
 
     testOutGenomes(); 
+
+    saveGenerationResults(); 
+
+    genNum++; 
+}
+
+/* speciation: The population is going to be split into different species based on compatability distance (delta = c1*E/N +c2*D/N + c3*W)
+        where c1-3 are coefficients (hyperparemeters), E are numExcess and D is numDisjoint genes, N is the number of connection genes within Genome (can be set to 1 if <20),
+        and W is avg weight differences of matching genes including disabled genes 
+
+        the different coeffs allow us to adjust how important the three factors are when it comes to two genomes being from the same species 
+*/
+void NEATRunner::speciate()
+{
+    
 }

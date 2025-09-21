@@ -7,7 +7,7 @@ class NEATRunner{
     static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static const float C1, C2, C3, COMP_THRESHOLD; // TODO: all hyperparams are subject to change 
     int globalInnvNum=0;
-
+    int genNum=0; 
 public:
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
@@ -19,14 +19,18 @@ public:
         (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
     */
     NEATRunner(); 
+
+    Genome initGenome(); 
+
+    // creates a connection on a genome and adheres with the innovation tracker
+    void createConnection(int in, int out , double weight, bool enabled, Genome &genome); 
+
+
+    void runGeneration(); 
+
     // steps of NEAT: speciation, mutation, then crossover 
 
-    /* speciation: The population is going to be split into different species based on compatability distance (delta = c1*E/N +c2*D/N + c3*W)
-        where c1-3 are coefficients (hyperparemeters), E are numExcess and D is numDisjoint genes, N is the number of connection genes within Genome (can be set to 1 if <20),
-        and W is avg weight differences of matching genes including disabled genes 
-
-        the different coeffs allow us to adjust how important the three factors are when it comes to two genomes being from the same species 
-    */
+    
     void speciate(); 
 
     /* mutation: mutations will be stored according to there connections and innovNums (3->4: 12)
@@ -54,11 +58,7 @@ public:
     // this is going to make use of parallelism to test out genomes efficiently
     void testOutGenomes(); 
 
-    Genome initGenome(); 
+    // record the results for the generation 
+    void saveGenerationResults(); 
 
-    // creates a connection on a genome and adheres with the innovation tracker
-    void createConnection(int in, int out , double weight, bool enabled, Genome &genome); 
-
-
-    void runGeneration(); 
 }; 
