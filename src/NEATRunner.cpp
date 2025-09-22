@@ -58,13 +58,13 @@ void NEATRunner::createConnection(int in, int out, double weight, bool enabled, 
 
 void NEATRunner::runGeneration()
 {
+    testOutGenomes(); 
+
     speciate(); 
 
     mutate(); 
 
     crossover(); 
-
-    testOutGenomes(); 
 
     saveGenerationResults(); 
 
@@ -79,5 +79,6 @@ void NEATRunner::runGeneration()
 */
 void NEATRunner::speciate()
 {
-    
+    // run through each genome, compare it's compatibility to each species, decide its species; 
+    // if there are no new species create one 
 }

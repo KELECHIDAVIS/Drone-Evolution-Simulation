@@ -5,7 +5,10 @@
 class NEATRunner{
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
     static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static const float C1, C2, C3, COMP_THRESHOLD; // TODO: all hyperparams are subject to change 
+    static const float C1=1.0, // how much weights excess genes have in differentiating species
+     C2=1.0, // how much weight disjoint genes have  
+     C3=.4, // how much weight weight differences have 
+    COMP_THRESHOLD=3.0; // TODO: all hyperparams are subject to change, initially just what the paper had 
     int globalInnvNum=0;
     int genNum=0; 
 public:
@@ -13,7 +16,7 @@ public:
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
-    
+    std::vector<Species> speciesList; 
     /* initialization: 
         all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs 
         (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )

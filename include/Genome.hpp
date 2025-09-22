@@ -47,5 +47,7 @@ struct Species{
     int id; 
     int bestFitness ; 
     int speciesFitness; 
-
+    int age; 
+    Genome representative; 
+    std::vector<Genome> members; 
 }; 
