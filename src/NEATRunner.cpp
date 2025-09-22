@@ -1,5 +1,5 @@
 #include "NEATRunner.hpp"
-
+#include <execution> // for parallelism
 NEATRunner::NEATRunner()
 {
     for (int i =0; i< POP_SIZE; i++){
@@ -69,6 +69,36 @@ void NEATRunner::runGeneration()
     saveGenerationResults(); 
 
     genNum++; 
+}
+
+//have the genomes run their simulations and record their info
+void NEATRunner::testOutGenomes(){
+    // genomes, networks, and environments are all parallel arrays (same size)
+    std::for_each(std::execution::par, genomes.begin(), genomes.end(),
+        [this, idx = 0](Genome &g) mutable {
+            Environment &env = environments[idx];
+            NeuralNetwork &net = networks[idx];
+
+            // Run simulation
+            double fitness = 0.0;
+            for (int step = 0; step < 1000; step++) {
+                Eigen::VectorXd input(6);
+                input << env.rocket.pos(0), env.rocket.pos(1),
+                         env.rocket.vel(0), env.rocket.vel(1),
+                         env.target.pos(0), env.target.pos(1);
+
+                Eigen::VectorXd output = net.feedForward(input);
+
+                env.rocket.setThrust(output(0));
+                env.rocket.setRotation((int)output(1));
+
+                env.update(0.016f); // fixed delta time
+            }
+
+            // Example fitness function
+            g.fitness = env.score;
+            idx++;
+        });
 }
 
 /* speciation: The population is going to be split into different species based on compatability distance (delta = c1*E/N +c2*D/N + c3*W)

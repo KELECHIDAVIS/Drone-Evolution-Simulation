@@ -12,7 +12,7 @@ public:
 
     // init target and rocket 
     Environment(int width, int height)
-    : windowWidth(width), windowHeight(height), target(0, width, height), rocket(width/2.0,height/2.0) {}
+    : windowWidth(width), windowHeight(height), target(width, height), rocket(width/2.0,height/2.0) {}
 
 
     void update(float deltaTime); 

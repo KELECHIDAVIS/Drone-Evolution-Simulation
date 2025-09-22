@@ -6,7 +6,7 @@ void Environment::update(float deltaTime){
 
     if( checkCollision()){ 
         score++; 
-        target = Target(score, windowWidth, windowHeight); 
+        target.respawn(windowWidth, windowHeight); 
     }
 }
 

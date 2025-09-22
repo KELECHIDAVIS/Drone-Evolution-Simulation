@@ -1,6 +1,9 @@
+#pragma once 
 #include <random>
 
 #include <utility>
+// in some global utility or singleton RNG
+std::mt19937 rng(std::random_device{}());
 
 // pair hash is needed to make pairs work in unorderd pairs within the NEAT RUNNER Class
 struct pair_hash {
@@ -12,6 +15,7 @@ struct pair_hash {
 
 // random number between range 
 double getRandNum ( double lower , double upper ){
-    double f = (double)rand() / RAND_MAX;
-    return lower + f * (upper - lower);
+    std::uniform_real_distribution<double> dist(lower, upper);
+    return dist(rng);
 }
+
