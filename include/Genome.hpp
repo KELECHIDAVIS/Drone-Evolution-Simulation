@@ -29,6 +29,7 @@ struct Connection{ // connects two nodes with a weight.
 struct Genome{ // the blueprint to build the neural network 
     std::vector<Node> nodes;    
     std::vector<Connection> connections; 
+    int speciesID; 
     double fitness = 0; 
 
     // Add a node (local ID unique in this genome)
@@ -40,4 +41,11 @@ struct Genome{ // the blueprint to build the neural network
     void addConnection(int in, int out, double weight, bool enabled, int innovation) {
         connections.emplace_back(in, out, weight, enabled, innovation);
     }
+}; 
+
+struct Species{ 
+    int id; 
+    int bestFitness ; 
+    int speciesFitness; 
+
 }; 
