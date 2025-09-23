@@ -22,18 +22,17 @@ Genome NEATRunner::initGenome()
 {
     Genome genome ; 
     
-    genome.addNode(NodeType::INPUT); // 0 
-    genome.addNode(NodeType::INPUT); // 1 
-    genome.addNode(NodeType::INPUT); //2
-    genome.addNode(NodeType::INPUT); //3
-    genome.addNode(NodeType::INPUT); //4
-    genome.addNode(NodeType::INPUT); //5
-    genome.addNode(NodeType::OUTPUT); //6
-    genome.addNode(NodeType::OUTPUT); //7
+    genome.addNode(NodeType::INPUT); // 0  // target relative x 
+    genome.addNode(NodeType::INPUT); // 1   // target relative y
+    genome.addNode(NodeType::INPUT); //2    // rocket x vel
+    genome.addNode(NodeType::INPUT); //3    // rocket y vel
+    genome.addNode(NodeType::OUTPUT); //4   // rocket thrust
+    genome.addNode(NodeType::OUTPUT); //5   // rocket rotation
+    
 
-    // Fully connect all inputs [0..5] to all outputs [6..7]
-    for (int in = 0; in <= 5; ++in) {
-        for (int out = 6; out <= 7; ++out) {
+    // Fully connect all inputs [0..3] to all outputs [4..5]
+    for (int in = 0; in <= 3; ++in) {
+        for (int out = 4; out <= 5; ++out) {
         createConnection(in, out, getRandNum(-1, 1), true, genome);
     }
 }
@@ -82,15 +81,21 @@ void NEATRunner::testOutGenomes(){
             // Run simulation
             double fitness = 0.0;
             for (int step = 0; step < 1000; step++) {
-                Eigen::VectorXd input(6);
-                input << env.rocket.pos(0), env.rocket.pos(1),
-                         env.rocket.vel(0), env.rocket.vel(1),
-                         env.target.pos(0), env.target.pos(1);
 
+                //instead should use the relative distance to the target as input
+                Eigen::VectorXd input(6);
+                
+
+                // normalize inputs from -1 to 1 
+                input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH; // target relative x
+                input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT; // target relative y
+                input(2) = env.rocket.vel(0) / Rocket::MAX_VEL; // rocket x vel
+                input(3) = env.rocket.vel(1) / Rocket::MAX_VEL; // rocket y vel     
+                
                 Eigen::VectorXd output = net.feedForward(input);
 
                 env.rocket.setThrust(output(0));
-                env.rocket.setRotation((int)output(1));
+                env.rocket.setRotation((int) (360*output(1))); // map from 0-1 to 0-360
 
                 env.update(0.016f); // fixed delta time
             }

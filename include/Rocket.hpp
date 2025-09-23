@@ -1,7 +1,7 @@
 #pragma once 
 #include <cmath>
 #include <Eigen/Dense>
-
+#define M_PI 3.14159265358979323846
 class Rocket{
 public:         
     const float mass = 1;  
