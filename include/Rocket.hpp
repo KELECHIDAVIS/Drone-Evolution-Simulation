@@ -17,6 +17,7 @@ public:
 
     static constexpr float GRAVITY = 30; //350; 
     static constexpr float MAX_THRUST =180;// 700; 
+    static constexpr float MAX_VEL = 500; // TODO: tune 
     
     Rocket(float x, float y ){
         pos<<x , y; 

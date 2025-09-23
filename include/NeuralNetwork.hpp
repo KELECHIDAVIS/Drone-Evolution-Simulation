@@ -112,6 +112,11 @@ public:
         return 1.0 / (1 + exp(-4.9*x)); 
     }
 
+
+    double sigmoid(double x){
+        return 1.0 / (1 + exp(-x)); 
+    }
+
     int numOutputs(){
         return outputNodeIds.size(); 
     }
