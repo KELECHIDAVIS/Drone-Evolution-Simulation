@@ -43,18 +43,17 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
 )
 
-# Define the executable
-add_executable(DroneEvo ${SOURCES})
+# Remove main.cpp from library sources
+list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-# Include header directory
-target_include_directories(DroneEvo PRIVATE include)
+# Create a library from your code (without main)
+add_library(DroneEvoLib STATIC ${SOURCES})
+target_include_directories(DroneEvoLib PUBLIC include)
+target_link_libraries(DroneEvoLib PUBLIC SFML::Graphics Eigen3::Eigen)
 
-# Link SFML
-target_link_libraries(DroneEvo PRIVATE SFML::Graphics)
-
-# Link Eigen (header-only) — this exposes include dirs
-target_link_libraries(DroneEvo PRIVATE Eigen3::Eigen)
-
+# Define the main executable (just contains main.cpp)
+add_executable(DroneEvo src/main.cpp)
+target_link_libraries(DroneEvo PRIVATE DroneEvoLib)
 
 # -------------------------------
 # Testing setup 
@@ -71,7 +70,6 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
 foreach(test_source ${TEST_SOURCES})
     get_filename_component(test_name ${test_source} NAME_WE)
     add_executable(${test_name} ${test_source})
-    target_include_directories(${test_name} PRIVATE include)
-    target_link_libraries(${test_name} PRIVATE Eigen3::Eigen SFML::Graphics)
+    target_link_libraries(${test_name} PRIVATE DroneEvoLib)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()

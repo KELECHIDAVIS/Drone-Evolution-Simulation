@@ -6,7 +6,7 @@ class NEATRunner{
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
     static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static const int SIM_LIFETIME =1000; // each genome gets 1000 frames 
-    static const float C1=1.0, // how much weights excess genes have in differentiating species
+    static constexpr float C1=1.0, // how much weights excess genes have in differentiating species
      C2=1.0, // how much weight disjoint genes have  
      C3=.4, // how much weight weight differences have 
     COMP_THRESHOLD=3.0; // TODO: all hyperparams are subject to change, initially just what the paper had 
@@ -27,7 +27,7 @@ public:
     Genome initGenome(); 
 
     // creates a connection on a genome and adheres with the innovation tracker
-    void createConnection(int in, int out , double weight, bool enabled, Genome &genome); 
+    void createConnection(int in, int out , double weight, bool enabled, bool isRecurrent, Genome &genome); 
 
 
     void runGeneration(); 

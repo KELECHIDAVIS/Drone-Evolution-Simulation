@@ -39,8 +39,8 @@ struct Genome{ // the blueprint to build the neural network
         nodes.emplace_back(newId, type);
     }
     // Add a connection with a new global innovation number
-    void addConnection(int in, int out, double weight, bool enabled, int innovation) {
-        connections.emplace_back(in, out, weight, enabled, innovation);
+    void addConnection(int in, int out, double weight, bool enabled, int innovation, bool isRecurrent) {
+        connections.emplace_back(in, out, weight, enabled, innovation, isRecurrent);
     }
 }; 
 

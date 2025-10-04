@@ -18,7 +18,7 @@ NEATRunner::NEATRunner()
     
 }
 
-Genome NEATRunner::initGenome() 
+Genome NEATRunner::initGenome() // at the start of the sim
 {
     Genome genome ; 
     
@@ -33,14 +33,14 @@ Genome NEATRunner::initGenome()
     // Fully connect all inputs [0..3] to all outputs [4..5]
     for (int in = 0; in <= 3; ++in) {
         for (int out = 4; out <= 5; ++out) {
-        createConnection(in, out, getRandNum(-1, 1), true, genome);
+        createConnection(in, out, getRandNum(-1, 1), true, false, genome);
     }
 }
 
     return genome; 
 }
 
-void NEATRunner::createConnection(int in, int out, double weight, bool enabled, Genome &genome)
+void NEATRunner::createConnection(int in, int out, double weight, bool enabled, bool isRecurrent, Genome &genome)
 {
     // if this connection alr exists just pull the innovation number 
     // otherwise store the current innv num, set connections innv num, then increment global num
@@ -52,7 +52,7 @@ void NEATRunner::createConnection(int in, int out, double weight, bool enabled, 
         innvNum = globalInnvNum; 
         globalInnvNum++;  
     }
-    genome.addConnection(in, out, weight, enabled, innvNum); 
+    genome.addConnection(in, out, weight, enabled, innvNum,isRecurrent); 
 }
 
 void NEATRunner::runGeneration()

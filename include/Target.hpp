@@ -14,7 +14,7 @@ public:
         respawn(windowWidth,windowHeight); 
     }
 
-    void Target::respawn( int width, int height) {
+    void respawn( int width, int height) {
         std::uniform_real_distribution<float> distX(0, width);
         std::uniform_real_distribution<float> distY(0, height);
         pos = {distX(rng), distY(rng)};
