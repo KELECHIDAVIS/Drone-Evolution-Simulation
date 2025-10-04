@@ -6,6 +6,11 @@
 #include <unordered_set> 
 #include <iostream> 
 
+
+// Diff activations for testing 
+    
+enum ActivationType { SIGMOID, TANH };
+
 // this is the phenotype that is based off the inputted genome 
 //CURRENTLY IS BASED ON A TOPLOGICAL/GRAPHICAL REPRESENTATION.  
 // TODO: optimize into a more linear algebra friendly framework 
@@ -16,7 +21,11 @@ class NeuralNetwork{
     std::vector<int> outputNodeIds;
     std::unordered_map<int, double> previousActivations; // to allow for recurrent connections
     bool isFirstStep; // track if first forward pass occured
+    
+    
 public:
+    
+    ActivationType activationType = TANH;
     
     void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, 
         std::vector<int>> &adjList, std::vector<int> &evalOrder){
@@ -34,9 +43,10 @@ public:
         
     }
     NeuralNetwork(){}; 
-    NeuralNetwork(Genome genome){ 
+    NeuralNetwork(Genome genome): NeuralNetwork(genome, SIGMOID){} // sigmoid is default  
+    NeuralNetwork(Genome genome, ActivationType type ){ 
         isFirstStep=true; 
-        
+        activationType = type; 
         for(Node node : genome.nodes){
             nodeTypes[node.id] = node.type; 
             if (node.type == NodeType::OUTPUT) {
@@ -112,7 +122,7 @@ public:
             }
 
             // apply activation and set value of node 
-            sum = steepenedSigmoid(sum); 
+            sum = activate(sum); 
             values[nodeID] =sum ; 
         }
 
@@ -127,10 +137,15 @@ public:
         isFirstStep = false;
 
         // now convert the values output output vector 
-        // Build clean Eigen vector of outputs
+        // Build output vector and MAP to (0, 1) for rocket controls
         Eigen::VectorXd output(outputNodeIds.size());
         for (size_t i = 0; i < outputNodeIds.size(); ++i) {
-            output(i) = values[outputNodeIds[i]];
+            // Map from (-1, 1) to (0, 1) if tanh 
+            if (activationType == TANH){
+                output(i) = (values[outputNodeIds[i]] + 1.0) / 2.0;
+            }else {
+                output(i) = values[outputNodeIds[i]]; // sigmoid is already returns btwn 0 nd 1 
+            }
         }
         return output;
     }
@@ -143,6 +158,14 @@ public:
         }
         isFirstStep = true;
     }
+
+    double activate(double x) {
+        if (activationType == TANH) {
+            return std::tanh(2.5 * x);
+        } else {
+            return steepenedSigmoid(x);
+        }
+    }
     double steepenedSigmoid(double x){
         return 1.0 / (1 + exp(-4.9*x)); 
     }
@@ -150,6 +173,10 @@ public:
 
     double sigmoid(double x){
         return 1.0 / (1 + exp(-x)); 
+    }
+
+    double tanh(double x ){
+        return std::tanh(2.5 * x);
     }
 
     int numOutputs(){

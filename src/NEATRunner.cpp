@@ -8,7 +8,7 @@ NEATRunner::NEATRunner()
         genomes.push_back(genome); 
 
         // init their neural networks
-        NeuralNetwork network(genome); 
+        NeuralNetwork network(genome, TANH); 
         networks.push_back(network); 
 
         // init their environments 
