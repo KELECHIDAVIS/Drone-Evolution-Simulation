@@ -1,5 +1,6 @@
 #include "NEATRunner.hpp"
 #include <execution> // for parallelism
+
 NEATRunner::NEATRunner()
 {
     for (int i =0; i< POP_SIZE; i++){
@@ -100,6 +101,8 @@ void NEATRunner::testOutGenomes(){
                 env.update(0.016f); // fixed delta time
             }
 
+            // reset memory between episodes 
+            net.reset(); 
             // Example fitness function
             g.fitness = env.score;
             idx++;

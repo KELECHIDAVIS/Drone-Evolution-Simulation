@@ -24,8 +24,8 @@ struct Connection{ // connects two nodes with a weight.
     bool isEnabled;
     bool isRecurrent; 
     int innvNum; // innovation number; the historical marker for when this connection appeared   
-    Connection(int in, int out, double w, bool en, int innov)
-        : inId(in), outId(out), weight(w), isEnabled(en), innvNum(innov) {}
+    Connection(int in, int out, double w, bool en, int innov,bool rec)
+        : inId(in), outId(out), weight(w), isEnabled(en),  innvNum(innov),isRecurrent(rec) {}
 }; 
 struct Genome{ // the blueprint to build the neural network 
     std::vector<Node> nodes;    

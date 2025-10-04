@@ -97,23 +97,33 @@ public:
             double sum = 0; 
             // for each incoming connection, add the weighted sum 
             for (Connection conn : incomingConnections[nodeID]){
-                if(conn.isRecurrent){
-                    sum+= conn.weight * previousActivations[conn.inId]; 
-                }else{
-                    sum+= conn.weight * values[conn.inId]; 
+                if(conn.isRecurrent) {
+                    // For recurrent connections, use previous activation
+                    // BUT: if the source is INPUT or BIAS, use current value
+                    if (nodeTypes[conn.inId] == NodeType::INPUT || 
+                        nodeTypes[conn.inId] == NodeType::BIAS) {
+                        sum += conn.weight * values[conn.inId];
+                    } else {
+                        sum += conn.weight * previousActivations[conn.inId]; 
+                    }
+                } else {
+                    sum += conn.weight * values[conn.inId]; 
                 }
             }
 
-            
-
             // apply activation and set value of node 
             sum = steepenedSigmoid(sum); 
-
             values[nodeID] =sum ; 
         }
 
         // Store current activations for next timestep
-        previousActivations = values;
+        // Only store activations for HIDDEN and OUTPUT nodes
+        for (int nodeID : evalOrder) {
+            if (nodeTypes[nodeID] != NodeType::INPUT && 
+                nodeTypes[nodeID] != NodeType::BIAS) {
+                previousActivations[nodeID] = values[nodeID];
+            }
+        }
         isFirstStep = false;
 
         // now convert the values output output vector 
