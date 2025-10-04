@@ -9,6 +9,7 @@
 
 
 int main(){
+    std::cout<<"Forehead"<<std::endl; 
     return 0; 
 }
 // int main()

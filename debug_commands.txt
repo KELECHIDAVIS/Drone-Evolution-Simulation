@@ -6,3 +6,6 @@ Remove-Item -Recurse -Force build; cmake --preset debug; cmake --build --preset 
 
 // build and run tests
 cmake --preset debug; cmake --build --preset debug; ctest --preset debug --output-on-failure
+
+// simple build run
+cd build; cmake --build; .\bin\Drone.exe

@@ -21,22 +21,25 @@ NEATRunner::NEATRunner()
 
 Genome NEATRunner::initGenome() // at the start of the sim
 {
-    Genome genome ; 
+    Genome genome; 
     
-    genome.addNode(NodeType::INPUT); // 0  // target relative x 
-    genome.addNode(NodeType::INPUT); // 1   // target relative y
-    genome.addNode(NodeType::INPUT); //2    // rocket x vel
-    genome.addNode(NodeType::INPUT); //3    // rocket y vel
-    genome.addNode(NodeType::OUTPUT); //4   // rocket thrust
-    genome.addNode(NodeType::OUTPUT); //5   // rocket rotation
+    genome.addNode(NodeType::INPUT);  // 0 - target relative x 
+    genome.addNode(NodeType::INPUT);  // 1 - target relative y
+    genome.addNode(NodeType::INPUT);  // 2 - rocket x vel
+    genome.addNode(NodeType::INPUT);  // 3 - rocket y vel
+    genome.addNode(NodeType::BIAS);   // 4 - bias
+    genome.addNode(NodeType::OUTPUT); // 5 - rocket thrust
+    genome.addNode(NodeType::OUTPUT); // 6 - rocket rotation
     
-
-    // Fully connect all inputs [0..3] to all outputs [4..5]
-    for (int in = 0; in <= 3; ++in) {
-        for (int out = 4; out <= 5; ++out) {
-        createConnection(in, out, getRandNum(-1, 1), true, false, genome);
+    // 50% chance per connection
+    for (int in = 0; in <= 4; ++in) {
+        for (int out = 5; out <= 6; ++out) {
+            if (getRandNum(0, 1) < 0.5) {
+                createConnection(in, out, getRandNum(-1, 1), true, false, genome);
+            }
+        }
     }
-}
+
 
     return genome; 
 }
@@ -81,7 +84,7 @@ void NEATRunner::testOutGenomes(){
 
             // Run simulation
             double fitness = 0.0;
-            for (int step = 0; step < 1000; step++) {
+            for (int step = 0; step < SIM_LIFETIME; step++) {
 
                 //instead should use the relative distance to the target as input
                 Eigen::VectorXd input(6);
