@@ -74,41 +74,39 @@ void NEATRunner::runGeneration()
     genNum++; 
 }
 
-//have the genomes run their simulations and record their info
-void NEATRunner::testOutGenomes(){
-    // genomes, networks, and environments are all parallel arrays (same size)
-    std::for_each(std::execution::par, genomes.begin(), genomes.end(),
-        [this, idx = 0](Genome &g) mutable {
-            Environment &env = environments[idx];
-            NeuralNetwork &net = networks[idx];
+// Single genome evaluation (non-parallel)
+double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env) {
+    env.reset();  // Make sure you have this method!
+    net.reset();
+    
+    for (int step = 0; step < SIM_LIFETIME; step++) {
+        Eigen::VectorXd input(4);
+        input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
+        input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
+        input(2) = env.rocket.vel(0) / Rocket::MAX_VEL;
+        input(3) = env.rocket.vel(1) / Rocket::MAX_VEL;
+        
+        Eigen::VectorXd output = net.feedForward(input);
+        env.rocket.setThrust(output(0));
+        env.rocket.setRotation((int)(360 * output(1)));
+        env.update(0.016f);
+    }
+    
+    return env.score; //TODO: CHANGE FITNESS FUNCTION 
+}
 
-            // Run simulation
-            double fitness = 0.0;
-            for (int step = 0; step < SIM_LIFETIME; step++) {
-
-                //instead should use the relative distance to the target as input
-                Eigen::VectorXd input(6);
-                
-
-                // normalize inputs from -1 to 1 
-                input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH; // target relative x
-                input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT; // target relative y
-                input(2) = env.rocket.vel(0) / Rocket::MAX_VEL; // rocket x vel
-                input(3) = env.rocket.vel(1) / Rocket::MAX_VEL; // rocket y vel     
-                
-                Eigen::VectorXd output = net.feedForward(input);
-
-                env.rocket.setThrust(output(0));
-                env.rocket.setRotation((int) (360*output(1))); // map from 0-1 to 0-360
-
-                env.update(0.016f); // fixed delta time
-            }
-
-            // reset memory between episodes 
-            net.reset(); 
-            // Example fitness function
-            g.fitness = env.score;
-            idx++;
+// Parallel wrapper
+void NEATRunner::testOutGenomes() {
+    std::vector<size_t> indices(genomes.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    
+    std::for_each(std::execution::par, indices.begin(), indices.end(),
+        [this](size_t idx) {
+            genomes[idx].fitness = evaluateGenome(
+                genomes[idx], 
+                networks[idx], 
+                environments[idx]
+            );
         });
 }
 
@@ -123,3 +121,7 @@ void NEATRunner::speciate()
     // run through each genome, compare it's compatibility to each species, decide its species; 
     // if there are no new species create one 
 }
+
+    
+    
+

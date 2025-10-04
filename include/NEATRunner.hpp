@@ -18,6 +18,9 @@ public:
     std::vector<Environment> environments;  
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
     std::vector<Species> speciesList; 
+    std::vector<Genome> bestGenomesPerGeneration;
+    Genome currentBestGenome;
+    double bestFitnessEver = 0.0;
     /* initialization: 
         all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs 
         (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
@@ -61,7 +64,7 @@ public:
     
     // this is going to make use of parallelism to test out genomes efficiently
     void testOutGenomes(); 
-
+    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env); 
     // record the results for the generation 
     void saveGenerationResults(); 
 

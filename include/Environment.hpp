@@ -21,6 +21,7 @@ public:
     bool checkCollision(); 
     void addThrust(float thrust);
     void rotate(float deg);  
+    void reset(); 
     Eigen::Matrix<float, 2,3> getRocketVertices(); 
 
 }; 

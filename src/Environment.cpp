@@ -9,7 +9,15 @@ void Environment::update(float deltaTime){
         target.respawn(windowWidth, windowHeight); 
     }
 }
-
+void Environment::reset() {
+    rocket.setThrust(0); 
+    rocket.setRotation(0);
+    rocket.pos=Eigen::Vector2d(windowWidth/2.0, windowHeight/2.0); 
+    rocket.vel=Eigen::Vector2d(0, 0); 
+    
+    target.respawn(windowWidth/2.0, windowHeight/2.0); 
+    score = 0;
+}
 //CAN FURTHER OPTIMIZE THIS 
 // ONLY CHECK COLLISION IF THEy ARE CLOSE (euclidean distance is is <= diameter of target + height of rocket)
 // SAT between 
