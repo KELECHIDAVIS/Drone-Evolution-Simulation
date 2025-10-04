@@ -14,6 +14,8 @@ class NeuralNetwork{
     std::unordered_map<int, NodeType> nodeTypes; // for quick type checking 
     std::unordered_map<int, std::vector<Connection>> incomingConnections; // to keep track of what nodes to pull input from when calculating this nodes output 
     std::vector<int> outputNodeIds;
+    std::unordered_map<int, double> previousActivations; // to allow for recurrent connections
+    bool isFirstStep; // track if first forward pass occured
 public:
     
     void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, 
@@ -33,13 +35,14 @@ public:
     }
     NeuralNetwork(){}; 
     NeuralNetwork(Genome genome){ 
-        
+        isFirstStep=true; 
         
         for(Node node : genome.nodes){
             nodeTypes[node.id] = node.type; 
             if (node.type == NodeType::OUTPUT) {
                 outputNodeIds.push_back(node.id);
             }
+            previousActivations[node.id] = 0.0 ;
         }
         
         
@@ -48,7 +51,11 @@ public:
         for(Connection conn : genome.connections){ // get each nodes incoming connections as well as just building and adj list 
             if (conn.isEnabled){
                 incomingConnections[conn.outId].push_back(conn);
-                adjList[conn.inId].push_back(conn.outId); 
+
+                // ONLY ADD NON RECURRENT CONNECTIONS TO ADJ LIST
+                if(!conn.isRecurrent){
+                    adjList[conn.inId].push_back(conn.outId); 
+                }
             }   
         }
 
@@ -90,14 +97,24 @@ public:
             double sum = 0; 
             // for each incoming connection, add the weighted sum 
             for (Connection conn : incomingConnections[nodeID]){
-                sum+= conn.weight * values[conn.inId]; 
+                if(conn.isRecurrent){
+                    sum+= conn.weight * previousActivations[conn.inId]; 
+                }else{
+                    sum+= conn.weight * values[conn.inId]; 
+                }
             }
+
+            
 
             // apply activation and set value of node 
             sum = steepenedSigmoid(sum); 
 
             values[nodeID] =sum ; 
         }
+
+        // Store current activations for next timestep
+        previousActivations = values;
+        isFirstStep = false;
 
         // now convert the values output output vector 
         // Build clean Eigen vector of outputs
@@ -108,6 +125,14 @@ public:
         return output;
     }
 
+    // SHOULD RUN BETWEEN EPISODES SO MEMORY DOESN'T BLEED OVER
+    void reset() {
+        // Clear previous activations between episodes
+        for (auto& pair : previousActivations) {
+            pair.second = 0.0;
+        }
+        isFirstStep = true;
+    }
     double steepenedSigmoid(double x){
         return 1.0 / (1 + exp(-4.9*x)); 
     }
