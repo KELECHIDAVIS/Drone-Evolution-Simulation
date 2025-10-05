@@ -116,10 +116,46 @@ void NEATRunner::testOutGenomes() {
 
         the different coeffs allow us to adjust how important the three factors are when it comes to two genomes being from the same species 
 */
+double NEATRunner::calcCompDistance(Genome& genome, Species& species){
+    Genome& rep = species.representative; 
+    int numExcess =0; 
+    int numDisjoint= 0; 
+    double avgWeightDiff= 0; 
+
+
+}
 void NEATRunner::speciate()
 {
     // run through each genome, compare it's compatibility to each species, decide its species; 
     // if there are no new species create one 
+    for(Genome &genome: genomes){
+        bool foundMatch = false; 
+
+        for(Species &species : speciesList){
+            // calc compatability 
+            double compDist = calcCompDistance(genome, species);
+            
+            // if within threshold genome belongs to species
+            if(compDist < COMP_THRESHOLD){
+                species.members.push_back(genome); 
+                foundMatch= true;
+                break; // stop looking through species 
+            } 
+        }
+
+        if(!foundMatch){ // create new species w/ this genome as its rep
+            Species newSpecies; 
+            newSpecies.id=speciesList.size(); 
+            newSpecies.bestFitness = genome.fitness; 
+            newSpecies.speciesFitness = genome.fitness; 
+            newSpecies.appearedInGen= genNum; 
+            newSpecies.representative = genome; 
+            newSpecies.members.push_back(genome); 
+        }
+    }
+
+    //TODO: calc species' fitness
+
 }
 
     

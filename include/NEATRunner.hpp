@@ -9,7 +9,7 @@ class NEATRunner{
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
      C2=1.0f, // how much weight disjoint genes have  
      C3=.4f, // how much weight weight differences have 
-    COMP_THRESHOLD=3.0f; // TODO: all hyperparams are subject to change, initially just what the paper had 
+    COMP_THRESHOLD=3.0f; 
     int globalInnvNum=0;
     int genNum=0; 
 public:
@@ -18,9 +18,7 @@ public:
     std::vector<Environment> environments;  
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
     std::vector<Species> speciesList; 
-    std::vector<Genome> bestGenomesPerGeneration;
-    Genome currentBestGenome;
-    double bestFitnessEver = 0.0;
+    
     /* initialization: 
         all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs 
         (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
@@ -37,7 +35,7 @@ public:
 
     // steps of NEAT: speciation, mutation, then crossover 
 
-    
+    double calcCompDistance(Genome& genome, Species& species); 
     void speciate(); 
 
     /* mutation: mutations will be stored according to there connections and innovNums (3->4: 12)

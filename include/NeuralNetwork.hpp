@@ -13,7 +13,7 @@ enum ActivationType { SIGMOID, TANH };
 
 // this is the phenotype that is based off the inputted genome 
 //CURRENTLY IS BASED ON A TOPLOGICAL/GRAPHICAL REPRESENTATION.  
-// TODO: optimize into a more linear algebra friendly framework 
+
 class NeuralNetwork{
     std::vector<int> evalOrder; // order nodes should be calculated in 
     std::unordered_map<int, NodeType> nodeTypes; // for quick type checking 
