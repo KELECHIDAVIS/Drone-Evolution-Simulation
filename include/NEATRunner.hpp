@@ -9,7 +9,7 @@ class NEATRunner{
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
      C2=1.0f, // how much weight disjoint genes have  
      C3=.4f, // how much weight weight differences have 
-    COMP_THRESHOLD=3.0f; 
+    COMP_THRESHOLD=.7f; 
     int globalInnvNum=0;
     int genNum=0; 
 public:

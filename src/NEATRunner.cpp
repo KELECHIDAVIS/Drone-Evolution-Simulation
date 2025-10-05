@@ -126,6 +126,7 @@ speciation: The population is going to be split into different species based on 
 
         the different coeffs allow us to adjust how important the three factors are when it comes to two genomes being from the same species 
 */
+// CONNECTION GENES ARE ASSUMED TO BE SORTED
 double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
     int numExcess =0; 
     int numDisjoint= 0; 
@@ -138,14 +139,15 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
     std::pair<int, int> parent1InnovRange= {INT_MAX, INT_MIN}; 
     std::pair<int, int> parent2InnovRange= {INT_MAX, INT_MIN}; 
 
+
     // TODO: obtain max innov nums from parents
     for(Connection &conn: parent1.connections){
         parent1InnovRange.first = std::min(conn.innvNum ,parent1InnovRange.first ); 
-        parent1InnovRange.second = std::min(conn.innvNum ,parent1InnovRange.second ); 
+        parent1InnovRange.second = std::max(conn.innvNum ,parent1InnovRange.second ); 
     }
     for(Connection &conn: parent2.connections){
         parent2InnovRange.first = std::min(conn.innvNum ,parent2InnovRange.first ); 
-        parent2InnovRange.second = std::min(conn.innvNum ,parent2InnovRange.second ); 
+        parent2InnovRange.second = std::max(conn.innvNum ,parent2InnovRange.second ); 
     }
     while(firstIt<parent1Size &&secondIt<parent2Size)
     {
@@ -181,7 +183,8 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 
     //(delta = c1*E/N +c2*D/N + c3*W)
     double N = std::max(parent1Size, parent2Size); 
-    avgWeightDiff/=numMatchingWeights; 
+    //if (N < 20) N = 1.0;  // normalization from paper 
+    if(numMatchingWeights>0) avgWeightDiff/=numMatchingWeights; 
 
     return C1*numExcess/N + C2*numDisjoint/N + C3*avgWeightDiff; 
 }
@@ -190,6 +193,11 @@ void NEATRunner::speciate()
     // run through each genome, compare it's compatibility to each species, decide its species; 
     // if there are no new species create one 
     for(Genome &genome: genomes){
+
+        // SORT CONNECTIONS IN GENOME TO MAKE SPECIATION EASIER
+        std::sort(genome.connections.begin(), genome.connections.end(), 
+        [](const Connection& a, const Connection& b) { return a.innvNum < b.innvNum; });
+
         bool foundMatch = false; 
 
         for(Species &species : speciesList){
@@ -198,8 +206,8 @@ void NEATRunner::speciate()
             
             // if within threshold genome belongs to species
             if(compDist < COMP_THRESHOLD){
-                species.members.push_back(genome); 
                 genome.speciesID = species.id; 
+                species.members.push_back(genome); 
                 foundMatch= true;
                 break; // stop looking through species 
             } 
@@ -208,6 +216,7 @@ void NEATRunner::speciate()
         if(!foundMatch){ // create new species w/ this genome as its rep
             Species newSpecies; 
             newSpecies.id=speciesList.size(); 
+            genome.speciesID= newSpecies.id; 
             newSpecies.bestFitness = genome.fitness; 
             newSpecies.speciesFitness = genome.fitness; 
             newSpecies.appearedInGen= genNum; 

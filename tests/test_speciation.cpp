@@ -170,6 +170,11 @@ void testSpeciesAssignment() {
         testGenomes.push_back(g);
     }
     
+    // DEBUG: Check distances between group 1 and group 2
+    std::cout << "\n  DEBUG: Checking compatibility distances:\n";
+    std::cout << "    Group1[0] to Group1[1]: " << runner.calcCompDistance(testGenomes[0], testGenomes[1]) << "\n";
+    std::cout << "    Group1[0] to Group2[0]: " << runner.calcCompDistance(testGenomes[0], testGenomes[3]) << "\n";
+    
     // Add genomes to runner
     runner.genomes = testGenomes;
     
@@ -195,6 +200,7 @@ void testSpeciesAssignment() {
         
         // Verify that all members have correct species ID
         for (const auto& member : species.members) {
+            std::cout<<"Member ID: "<< member.speciesID<< std::endl; 
             assert(member.speciesID == species.id);
         }
     }
