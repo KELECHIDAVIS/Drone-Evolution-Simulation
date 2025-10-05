@@ -9,3 +9,21 @@ cmake --preset debug; cmake --build --preset debug; ctest --preset debug --outpu
 
 // simple build run
 cd build; cmake --build; .\bin\Drone.exe
+
+# Full build and test
+mkdir build && cd build
+cmake ..
+cmake --build .
+ctest
+
+# Run only recurrent tests
+ctest -R RecurrentNEAT
+
+# Verbose output (see all test output)
+ctest -R RecurrentNEAT --verbose
+
+# Show output only on failure
+ctest --output-on-failure
+
+# Run by label
+ctest -L recurrent

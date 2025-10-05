@@ -12,8 +12,8 @@ void Environment::update(float deltaTime){
 void Environment::reset() {
     rocket.setThrust(0); 
     rocket.setRotation(0);
-    rocket.pos=Eigen::Vector2d(windowWidth/2.0, windowHeight/2.0); 
-    rocket.vel=Eigen::Vector2d(0, 0); 
+    rocket.pos=Eigen::Vector2f(windowWidth/2.0, windowHeight/2.0); 
+    rocket.vel=Eigen::Vector2f(0, 0); 
     
     target.respawn(windowWidth/2.0, windowHeight/2.0); 
     score = 0;

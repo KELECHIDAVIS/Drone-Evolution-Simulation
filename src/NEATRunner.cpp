@@ -95,6 +95,14 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     return env.score; //TODO: CHANGE FITNESS FUNCTION 
 }
 
+void NEATRunner::saveGenerationResults()
+{
+}
+
+void NEATRunner::crossover()
+{
+}
+
 // Parallel wrapper
 void NEATRunner::testOutGenomes() {
     std::vector<size_t> indices(genomes.size());
@@ -110,19 +118,59 @@ void NEATRunner::testOutGenomes() {
         });
 }
 
-/* speciation: The population is going to be split into different species based on compatability distance (delta = c1*E/N +c2*D/N + c3*W)
-        where c1-3 are coefficients (hyperparemeters), E are numExcess and D is numDisjoint genes, N is the number of connection genes within Genome (can be set to 1 if <20),
+/*
+Genes that don't match are either excess (within other parents innv range), disjoint (outside range) 
+speciation: The population is going to be split into different species based on compatability distance (delta = c1*E/N +c2*D/N + c3*W)
+        where c1-3 are coefficients (hyperparemeters), E are numExcess and D is numDisjoint genes, N is the number of connection genes within larger Genome (can be set to 1 if <20),
         and W is avg weight differences of matching genes including disabled genes 
 
         the different coeffs allow us to adjust how important the three factors are when it comes to two genomes being from the same species 
 */
-double NEATRunner::calcCompDistance(Genome& genome, Species& species){
-    Genome& rep = species.representative; 
+double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
     int numExcess =0; 
     int numDisjoint= 0; 
     double avgWeightDiff= 0; 
 
+    int numMatchingWeights=0; 
+    int firstIt=0, secondIt=0; 
+    int parent1Size = parent1.connections.size(); 
+    int parent2Size = parent2.connections.size(); 
+    int parent1MaxInnv = parent1.connections[parent1Size-1].innvNum; 
+    int parent2MaxInnv = parent2.connections[parent2Size-1].innvNum; 
 
+    while(firstIt<parent1Size &&secondIt<parent2Size)
+    {
+        // if both current connections have same inv num continue
+        Connection& conn1 = parent1.connections[firstIt]; 
+        Connection& conn2 = parent2.connections[secondIt]; 
+        if(conn1.innvNum == conn2.innvNum){
+            firstIt++; 
+            secondIt++; 
+            // calc avg weight diff
+            avgWeightDiff+= std::abs(conn1.weight - conn2.weight)   ; 
+            numMatchingWeights++; 
+        }else if (conn1.innvNum > conn2.innvNum){
+            // if conn2 within range of parent1 connections its disjoint
+            if (conn2.innvNum < parent1MaxInnv){
+                numDisjoint++; 
+            }
+            secondIt++; 
+        }else{
+            if (conn1.innvNum < parent2MaxInnv){
+                numDisjoint++; 
+            }
+            firstIt++; 
+        }
+
+    }
+    // now anything left over is excess; since one is zero just add 
+    numExcess = (parent1Size-firstIt)+(parent2Size-secondIt); 
+
+    //(delta = c1*E/N +c2*D/N + c3*W)
+    double N = std::max(parent1Size, parent2Size); 
+    avgWeightDiff/=numMatchingWeights; 
+
+    return C1*numExcess/N + C2*numDisjoint/N + C3*avgWeightDiff; 
 }
 void NEATRunner::speciate()
 {
@@ -133,11 +181,12 @@ void NEATRunner::speciate()
 
         for(Species &species : speciesList){
             // calc compatability 
-            double compDist = calcCompDistance(genome, species);
+            double compDist = calcCompDistance(genome, species.representative);
             
             // if within threshold genome belongs to species
             if(compDist < COMP_THRESHOLD){
                 species.members.push_back(genome); 
+                genome.speciesID = species.id; 
                 foundMatch= true;
                 break; // stop looking through species 
             } 
@@ -151,13 +200,25 @@ void NEATRunner::speciate()
             newSpecies.appearedInGen= genNum; 
             newSpecies.representative = genome; 
             newSpecies.members.push_back(genome); 
+            speciesList.push_back(newSpecies); 
         }
     }
 
-    //TODO: calc species' fitness
+    
+    // again for each species set their adjust fitness based on the size of their species 
+    for (Species &species: speciesList){
+        species.bestFitness = INT_MIN; 
+        species.speciesFitness = 0; 
+        for(Genome& genome : species.members){
+            genome.adjustedFitness = genome.fitness/species.members.size(); 
+            species.bestFitness = std::max(genome.fitness, species.bestFitness) ; 
+            species.speciesFitness += genome.fitness; 
+        }
+        species.speciesFitness/= species.members.size(); 
+    }
 
 }
 
-    
-    
-
+void NEATRunner::mutate()
+{
+}

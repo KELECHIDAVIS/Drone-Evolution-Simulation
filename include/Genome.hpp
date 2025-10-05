@@ -31,8 +31,8 @@ struct Genome{ // the blueprint to build the neural network
     std::vector<Node> nodes;    
     std::vector<Connection> connections; 
     int speciesID; 
-    double fitness = 0; 
-
+    double fitness; 
+    double adjustedFitness; // fitness divided by number of organisms in the same species
     // Add a node (local ID unique in this genome)
     void addNode(NodeType type) {
         int newId = nodes.empty() ? 0 : (nodes.back().id + 1);
@@ -46,8 +46,8 @@ struct Genome{ // the blueprint to build the neural network
 
 struct Species{ 
     int id; 
-    int bestFitness ; 
-    int speciesFitness; 
+    double bestFitness ; //  best raw fitness 
+    double speciesFitness; //avg raw fitness of species
     int appearedInGen; // what generation did it appear 
     Genome representative; 
     std::vector<Genome> members; 

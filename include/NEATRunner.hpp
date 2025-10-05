@@ -35,7 +35,8 @@ public:
 
     // steps of NEAT: speciation, mutation, then crossover 
 
-    double calcCompDistance(Genome& genome, Species& species); 
+    double calcCompDistance(Genome& parent1, Genome& parent2); 
+    
     void speciate(); 
 
     /* mutation: mutations will be stored according to there connections and innovNums (3->4: 12)
