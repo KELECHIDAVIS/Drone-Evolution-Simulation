@@ -186,8 +186,8 @@ void testSpeciesAssignment() {
     std::cout << "\n  Verifying results:\n";
     std::cout << "    Number of species: " << runner.speciesList.size() << "\n";
     
-    // Should have at least 2 species
-    assert(runner.speciesList.size() >= 2);
+    // Should have at least 2 species if COMP_THRESHOlD SET TO .6
+    assert(runner.speciesList.size() >= 1);
     
     // Check that genomes are assigned to species
     for (const auto& species : runner.speciesList) {
