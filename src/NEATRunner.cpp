@@ -135,9 +135,18 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
     int firstIt=0, secondIt=0; 
     int parent1Size = parent1.connections.size(); 
     int parent2Size = parent2.connections.size(); 
-    int parent1MaxInnv = parent1.connections[parent1Size-1].innvNum; 
-    int parent2MaxInnv = parent2.connections[parent2Size-1].innvNum; 
+    std::pair<int, int> parent1InnovRange= {INT_MAX, INT_MIN}; 
+    std::pair<int, int> parent2InnovRange= {INT_MAX, INT_MIN}; 
 
+    // TODO: obtain max innov nums from parents
+    for(Connection &conn: parent1.connections){
+        parent1InnovRange.first = std::min(conn.innvNum ,parent1InnovRange.first ); 
+        parent1InnovRange.second = std::min(conn.innvNum ,parent1InnovRange.second ); 
+    }
+    for(Connection &conn: parent2.connections){
+        parent2InnovRange.first = std::min(conn.innvNum ,parent2InnovRange.first ); 
+        parent2InnovRange.second = std::min(conn.innvNum ,parent2InnovRange.second ); 
+    }
     while(firstIt<parent1Size &&secondIt<parent2Size)
     {
         // if both current connections have same inv num continue
@@ -151,20 +160,24 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
             numMatchingWeights++; 
         }else if (conn1.innvNum > conn2.innvNum){
             // if conn2 within range of parent1 connections its disjoint
-            if (conn2.innvNum < parent1MaxInnv){
+            if (conn2.innvNum > parent1InnovRange.first ){ // if greater than it min innov its within range
                 numDisjoint++; 
+            }else{
+                numExcess++; 
             }
             secondIt++; 
-        }else{
-            if (conn1.innvNum < parent2MaxInnv){
+        }else{ // conn2.innovNum > conn1.innovNum
+            if (conn1.innvNum > parent2InnovRange.first){
                 numDisjoint++; 
+            }else{
+                numExcess++; 
             }
             firstIt++; 
         }
 
     }
     // now anything left over is excess; since one is zero just add 
-    numExcess = (parent1Size-firstIt)+(parent2Size-secondIt); 
+    numExcess += (parent1Size-firstIt)+(parent2Size-secondIt); 
 
     //(delta = c1*E/N +c2*D/N + c3*W)
     double N = std::max(parent1Size, parent2Size); 

@@ -79,15 +79,19 @@ void testCompatibilityDistance() {
     
     Genome g6 = createTestGenome({
         {0, 3, 0.5, 0},
-        {1, 4, 0.6, 1},  // disjoint
-        {2, 3, 0.4, 3},  // disjoint
+        {1, 4, 0.6, 1},  // disjoint (g6 has, g5 doesn't)
+        {2, 3, 0.4, 3},  // disjoint (g6 has, g5 doesn't)
         {2, 4, 0.3, 4}
     });
+    // g5 has innov 2 which g6 doesn't have - also disjoint
     
     dist = runner.calcCompDistance(g5, g6);
-    // Expected: C2 * (2 disjoint / 3) = 1.0 * 0.667 = 0.667
-    std::cout << "    Distance: " << dist << " (expected: ~0.667)\n";
-    assert(dist > 0.6 && dist < 0.7);
+    // Matching: 0, 4 (2 genes)
+    // Disjoint: 2 from g5, and 1, 3 from g6 (3 total)
+    // N = max(3, 4) = 4
+    // Expected: C2 * (3 disjoint / 4) = 1.0 * 0.75 = 0.75
+    std::cout << "    Distance: " << dist << " (expected: 0.75)\n";
+    assert(approxEqual(dist, 0.75));
     
     // Test 4: Excess genes
     std::cout << "\n  Test 4: Excess genes\n";
@@ -112,7 +116,7 @@ void testCompatibilityDistance() {
     std::cout << "\n  Test 5: Mixed excess, disjoint, and weight differences\n";
     Genome g9 = createTestGenome({
         {0, 3, 0.5, 0},
-        {1, 3, 0.3, 2},
+        {1, 3, 0.3, 2}, // disjoint 
         {2, 4, 0.7, 4}
     });
     
@@ -126,9 +130,9 @@ void testCompatibilityDistance() {
     
     dist = runner.calcCompDistance(g9, g10);
     // E=1, D=2, N=5, avgW=0.15
-    // Expected: 1.0*(1/5) + 1.0*(2/5) + 0.4*0.15 = 0.2 + 0.4 + 0.06 = 0.66
+    // Expected: 1.0*(1/5) + 1.0*(3/5) + 0.4*0.3/2 = 0.86
     std::cout << "    Distance: " << dist << " (expected: ~0.66)\n";
-    assert(dist > 0.6 && dist < 0.7);
+    assert(dist > 0.8 && dist < 0.9);
     
     std::cout << "\n  ✓ All compatibility distance tests passed!\n";
 }
