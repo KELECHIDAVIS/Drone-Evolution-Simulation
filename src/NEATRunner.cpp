@@ -140,7 +140,6 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
     std::pair<int, int> parent2InnovRange= {INT_MAX, INT_MIN}; 
 
 
-    // TODO: obtain max innov nums from parents
     for(Connection &conn: parent1.connections){
         parent1InnovRange.first = std::min(conn.innvNum ,parent1InnovRange.first ); 
         parent1InnovRange.second = std::max(conn.innvNum ,parent1InnovRange.second ); 
@@ -149,6 +148,7 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
         parent2InnovRange.first = std::min(conn.innvNum ,parent2InnovRange.first ); 
         parent2InnovRange.second = std::max(conn.innvNum ,parent2InnovRange.second ); 
     }
+
     while(firstIt<parent1Size &&secondIt<parent2Size)
     {
         // if both current connections have same inv num continue
@@ -241,6 +241,4 @@ void NEATRunner::speciate()
 
 }
 
-void NEATRunner::mutate()
-{
-}
+ 

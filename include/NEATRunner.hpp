@@ -39,25 +39,13 @@ public:
     
     void speciate(); 
 
-    /* mutation: mutations will be stored according to there connections and innovNums (3->4: 12)
-    Mutation chances are determined by hyperparams, initially:
-    The champion of each species with more the 5 members remains unchanged 
-    Each Genome has an 80% chance of getting their connection weights mutated: 
-        In which case each weight has a 90% chance of being uniformly perturbed 
-        And A 10% chance of being assigned a new random value 
-    */
+    
     void mutate(); 
 
     /*crossover: 
     FOR EACH NEW CONNECTION UPDATE GLOBAL INNOVATION NUM
     There is a 75% chance that and a gene will be disabled if it was disabled in either parent
     Interspecies mating rate is .001
-    For smaller populations: 
-        new node chance: .03
-        new link chance: .05
-    For Larger populations: 
-        new node chance: .03
-        new link chance: .3  // because larger pops can tolerate a larger number of prospective species and greater diversity
     */
     void crossover();
     
