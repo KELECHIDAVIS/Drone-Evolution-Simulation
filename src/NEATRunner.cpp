@@ -65,9 +65,9 @@ void NEATRunner::runGeneration()
 
     speciate(); 
 
-    mutate(); 
-
     crossover(); 
+
+    mutate(); 
 
     saveGenerationResults(); 
 
@@ -95,14 +95,6 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     return env.score; //TODO: CHANGE FITNESS FUNCTION 
 }
 
-void NEATRunner::saveGenerationResults()
-{
-}
-
-void NEATRunner::crossover()
-{
-}
-
 // Parallel wrapper
 void NEATRunner::testOutGenomes() {
     std::vector<size_t> indices(genomes.size());
@@ -117,6 +109,25 @@ void NEATRunner::testOutGenomes() {
             );
         });
 }
+
+void NEATRunner::saveGenerationResults()
+{
+}
+
+// cross over happens within species with a .001 chance for interspecies mating
+/*Every species is assigned a diff number of offspring in proportion to the sum of adjusted fitnesses of its members
+Species then reproduces by first eliminating lowest performers (lower performers have a higer likelihood of getting replaced to protect innovation)
+Then replace the spaces with offspring
+*/
+void NEATRunner::crossover()
+{
+    for(Species& species: speciesList){
+        // calc what proportion of the population their offspring should make up in the next generation 
+        float proportion= ((float)species.sumOfAdjFits)/((float) totalAdjFit); 
+        int numOffSpring= proportion*POP_SIZE; 
+    }
+}
+
 
 /*
 Genes that don't match are either excess (within other parents innv range), disjoint (outside range) 
@@ -183,13 +194,14 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 
     //(delta = c1*E/N +c2*D/N + c3*W)
     double N = std::max(parent1Size, parent2Size); 
-    //if (N < 20) N = 1.0;  // normalization from paper 
+    if (N < 20) N = 1.0;  // normalization from paper
     if(numMatchingWeights>0) avgWeightDiff/=numMatchingWeights; 
 
     return C1*numExcess/N + C2*numDisjoint/N + C3*avgWeightDiff; 
 }
 void NEATRunner::speciate()
 {
+
     // run through each genome, compare it's compatibility to each species, decide its species; 
     // if there are no new species create one 
     for(Genome &genome: genomes){
@@ -218,7 +230,6 @@ void NEATRunner::speciate()
             newSpecies.id=speciesList.size(); 
             genome.speciesID= newSpecies.id; 
             newSpecies.bestFitness = genome.fitness; 
-            newSpecies.speciesFitness = genome.fitness; 
             newSpecies.appearedInGen= genNum; 
             newSpecies.representative = genome; 
             newSpecies.members.push_back(genome); 
@@ -227,18 +238,23 @@ void NEATRunner::speciate()
     }
 
     
+    // sum total adj fit for all species within population
+    totalAdjFit= 0; 
+
     // again for each species set their adjust fitness based on the size of their species 
     for (Species &species: speciesList){
         species.bestFitness = INT_MIN; 
-        species.speciesFitness = 0; 
+        species.sumOfAdjFits = 0; 
         for(Genome& genome : species.members){
             genome.adjustedFitness = genome.fitness/species.members.size(); 
             species.bestFitness = std::max(genome.fitness, species.bestFitness) ; 
-            species.speciesFitness += genome.fitness; 
+            species.sumOfAdjFits += genome.adjustedFitness; 
         }
-        species.speciesFitness/= species.members.size(); 
+        totalAdjFit+=species.sumOfAdjFits; 
     }
 
 }
 
- 
+void NEATRunner::mutate()
+{
+}

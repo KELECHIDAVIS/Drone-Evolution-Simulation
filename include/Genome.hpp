@@ -47,7 +47,7 @@ struct Genome{ // the blueprint to build the neural network
 struct Species{ 
     int id; 
     double bestFitness ; //  best raw fitness 
-    double speciesFitness; //avg raw fitness of species
+    double sumOfAdjFits; //to assign number of offspring produced by a certain species 
     int appearedInGen; // what generation did it appear 
     Genome representative; 
     std::vector<Genome> members; 

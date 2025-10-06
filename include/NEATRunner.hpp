@@ -12,6 +12,7 @@ class NEATRunner{
     COMP_THRESHOLD=3.0f; 
     int globalInnvNum=0;
     int genNum=0; 
+    int totalAdjFit; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have   
 public:
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
@@ -39,7 +40,7 @@ public:
     
     void speciate(); 
 
-    
+
     void mutate(); 
 
     /*crossover: 
