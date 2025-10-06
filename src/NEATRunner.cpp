@@ -128,7 +128,7 @@ void NEATRunner::crossover()
         float proportion= species.sumOfAdjFits/((float) totalAdjFit); 
         int numOffSpring= floor(proportion*POP_SIZE); //round down 
         
-        
+         
     }
 }
 
