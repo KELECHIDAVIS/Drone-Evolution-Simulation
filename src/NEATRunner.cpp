@@ -121,10 +121,14 @@ Then replace the spaces with offspring
 */
 void NEATRunner::crossover()
 {
+    std::vector<Genome> nextGen(); 
+    int numAllocated = 0; 
     for(Species& species: speciesList){
         // calc what proportion of the population their offspring should make up in the next generation 
-        float proportion= ((float)species.sumOfAdjFits)/((float) totalAdjFit); 
-        int numOffSpring= proportion*POP_SIZE; 
+        float proportion= species.sumOfAdjFits/((float) totalAdjFit); 
+        int numOffSpring= floor(proportion*POP_SIZE); //round down 
+        
+        
     }
 }
 
@@ -251,6 +255,7 @@ void NEATRunner::speciate()
             species.sumOfAdjFits += genome.adjustedFitness; 
         }
         totalAdjFit+=species.sumOfAdjFits; 
+        // TODO: store the species with the best adjusted fitness for excess 
     }
 
 }
