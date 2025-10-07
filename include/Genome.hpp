@@ -49,6 +49,5 @@ struct Species{
     double bestFitness ; //  best raw fitness 
     double sumOfAdjFits; //to assign number of offspring produced by a certain species 
     int appearedInGen; // what generation did it appear 
-    Genome representative; 
     std::vector<Genome> members; 
 }; 

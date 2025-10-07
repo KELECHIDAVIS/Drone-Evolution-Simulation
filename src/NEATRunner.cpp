@@ -114,22 +114,77 @@ void NEATRunner::saveGenerationResults()
 {
 }
 
-// cross over happens within species with a .001 chance for interspecies mating
-/*Every species is assigned a diff number of offspring in proportion to the sum of adjusted fitnesses of its members
+/*
+Every species is assigned a diff number of offspring in proportion to the sum of adjusted fitnesses of its members
+Champ of each species with more than 5 members gets copied unchanged 
 Species then reproduces by first eliminating lowest performers (lower performers have a higer likelihood of getting replaced to protect innovation)
+cross over happens within species with a .001 chance for interspecies mating
 Then replace the spaces with offspring
 */
+Genome& selectParentFromSpecies(Species& species) {
+    // Calculate total fitness
+    double totalFitness = 0;
+    for(Genome& g : species.members) {
+        totalFitness += g.fitness;
+    }
+    
+    // Roulette wheel selection
+    double random = getRandNum(0, totalFitness);
+    double cumulative = 0;
+    for(Genome& g : species.members) {
+        cumulative += g.fitness;
+        if(cumulative >= random) {
+            return g;
+        }
+    }
+    
+    return species.members.front(); // fallback
+}
+Genome performCrossover(Genome& parent1, Genome& parent2 ){
+    
+}
 void NEATRunner::crossover()
 {
-    std::vector<Genome> nextGen(); 
-    int numAllocated = 0; 
+    std::vector<Genome> nextGen; 
+    int spotsLeft = POP_SIZE; 
     for(Species& species: speciesList){
         // calc what proportion of the population their offspring should make up in the next generation 
         float proportion= species.sumOfAdjFits/((float) totalAdjFit); 
         int numOffSpring= floor(proportion*POP_SIZE); //round down 
         
-         
+        // if the case happens that it's greater than the max, set to it 
+        if (numOffSpring > spotsLeft) numOffSpring = spotsLeft; 
+
+        spotsLeft -= numOffSpring; 
+
+        // TODO: will just sort for rn but could use adj fit as an average and if genome < speciesAdj it gets deleted  
+        // remove badly performing members from a species; greater fits are at front 
+        std::sort(species.members.begin(), species.members.end(), 
+        [](const Genome& a, const Genome& b) { return a.fitness > b.fitness; });
+
+        // add champ of species to next gen if member size >=5 
+        if (species.members.size() >4){
+            nextGen.push_back(species.members[0]);
+            numOffSpring--;  
+        }
+
+        int newSize = std::ceil(species.members.size()/2.0) ; // remove half 
+        species.members.resize(newSize); 
+
+        while(numOffSpring > 0)
+        {
+            Genome& parent1 = selectParentFromSpecies(species); 
+            Genome& parent2 = selectParentFromSpecies(species); 
+            Genome offspring = performCrossover(parent1,parent2); 
+            numOffSpring--; 
+        }
+
+
+
     }
+    // if there are left over spots give to the best species 
+
+    // add the genomes to their species 
 }
 
 
@@ -218,7 +273,10 @@ void NEATRunner::speciate()
 
         for(Species &species : speciesList){
             // calc compatability 
-            double compDist = calcCompDistance(genome, species.representative);
+            //select rand genome to be rep if size > 1 
+            int numMembers= species.members.size(); 
+            int randIndx = (numMembers == 1)  ? 0  :  floor(getRandNum(0, numMembers)); 
+            double compDist = calcCompDistance(genome, species.members[randIndx]);
             
             // if within threshold genome belongs to species
             if(compDist < COMP_THRESHOLD){
@@ -235,7 +293,6 @@ void NEATRunner::speciate()
             genome.speciesID= newSpecies.id; 
             newSpecies.bestFitness = genome.fitness; 
             newSpecies.appearedInGen= genNum; 
-            newSpecies.representative = genome; 
             newSpecies.members.push_back(genome); 
             speciesList.push_back(newSpecies); 
         }
