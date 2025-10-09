@@ -121,7 +121,8 @@ Species then reproduces by first eliminating lowest performers (lower performers
 cross over happens within species with a .001 chance for interspecies mating
 Then replace the spaces with offspring
 */
-Genome& selectParentFromSpecies(Species& species) {
+// uses fitness proportionate selection; The higher the fitness the greater chance to be picked 
+Genome& NEATRunner::selectParentFromSpecies(Species& species) {
     // Calculate total fitness
     double totalFitness = 0;
     for(Genome& g : species.members) {
@@ -140,8 +141,13 @@ Genome& selectParentFromSpecies(Species& species) {
     
     return species.members.front(); // fallback
 }
-Genome performCrossover(Genome& parent1, Genome& parent2 ){
-    
+Genome NEATRunner::performCrossover(Genome& parent1, Genome& parent2 ){
+    // Matching genes are inherited randomly, disjoint and excess genes are inherited from most fit parent 
+    // make the calc comp distance function return 
+}
+Species& NEATRunner::selectRandomSpecies(){
+    int indx = std::floor(getRandNum(0, speciesList.size())); 
+    return speciesList[indx]; 
 }
 void NEATRunner::crossover()
 {
@@ -162,21 +168,43 @@ void NEATRunner::crossover()
         std::sort(species.members.begin(), species.members.end(), 
         [](const Genome& a, const Genome& b) { return a.fitness > b.fitness; });
 
-        // add champ of species to next gen if member size >=5 
-        if (species.members.size() >4){
-            nextGen.push_back(species.members[0]);
-            numOffSpring--;  
-        }
 
-        int newSize = std::ceil(species.members.size()/2.0) ; // remove half 
+        int newSize = std::ceil(species.members.size()/2.0) ; // remove bottom half 
         species.members.resize(newSize); 
 
-        while(numOffSpring > 0)
-        {
-            Genome& parent1 = selectParentFromSpecies(species); 
-            Genome& parent2 = selectParentFromSpecies(species); 
-            Genome offspring = performCrossover(parent1,parent2); 
-            numOffSpring--; 
+        
+        for ( int j=0; j< numOffSpring; j++){
+            Genome offspring; 
+            // Champion preservation (first offspring if species > 5)
+            if(j == 0 && species.members.size() > 5) {
+                offspring = species.members[0]; // best genome, unchanged
+            }
+            // Single member - asexual reproduction
+            else if(species.members.size() == 1) {
+                offspring = species.members[0];
+            }
+            // Mutation only (25% of offspring)
+            else if(getRandNum(0, 1) < 0.25) {
+                Genome& parent = selectParentFromSpecies(species);
+                offspring = parent;
+            }
+            // Crossover (75% of offspring)
+            else {
+                if(getRandNum(0, 1) < 0.001) {
+                    // Interspecies mating
+                    Genome& parent1 = selectParentFromSpecies(species);
+                    Species& otherSpecies = selectRandomSpecies();
+                    Genome& parent2 = selectParentFromSpecies(otherSpecies);
+                    offspring = performCrossover(parent1, parent2);
+                } else {
+                    // Within-species mating
+                    Genome& parent1 = selectParentFromSpecies(species);
+                    Genome& parent2 = selectParentFromSpecies(species);
+                    offspring = performCrossover(parent1, parent2);
+                }
+            }
+            
+            nextGen.push_back(offspring);
         }
 
 

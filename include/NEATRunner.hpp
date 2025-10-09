@@ -41,15 +41,20 @@ public:
     void speciate(); 
 
 
-    void mutate(); 
+    void mutate();
 
-    /*crossover: 
-    FOR EACH NEW CONNECTION UPDATE GLOBAL INNOVATION NUM
-    There is a 75% chance that and a gene will be disabled if it was disabled in either parent
-    Interspecies mating rate is .001
-    */
+    Genome &selectParentFromSpecies(Species &species);
+
+    Genome performCrossover(Genome &parent1, Genome &parent2);
+
+    /*crossover:
+        FOR EACH NEW CONNECTION UPDATE GLOBAL INNOVATION NUM
+        There is a 75% chance that and a gene will be disabled if it was disabled in either parent
+        Interspecies mating rate is .001
+        */
+    Species &selectRandomSpecies();
     void crossover();
-    
+
     // this is going to make use of parallelism to test out genomes efficiently
     void testOutGenomes(); 
     double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env); 
