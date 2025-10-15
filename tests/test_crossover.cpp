@@ -31,7 +31,7 @@ void testPopulationSizePreservation() {
     std::cout << "\n✅ Testing Population Size Preservation...\n";
     
     NEATRunner runner;
-    const int INITIAL_POP = 150; // Should match POP_SIZE
+    const int INITIAL_POP = NEATRunner::POP_SIZE; // Should match POP_SIZE
     
     // Create initial population with varying fitness
     runner.genomes.clear();
@@ -45,7 +45,9 @@ void testPopulationSizePreservation() {
     
     // Run one generation
     runner.testOutGenomes();
+
     runner.speciate();
+    
     runner.crossover();
     
     std::cout << "  Initial population: " << INITIAL_POP << "\n";

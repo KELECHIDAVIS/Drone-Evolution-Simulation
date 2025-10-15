@@ -3,6 +3,7 @@
 #include "Environment.hpp"
 #include "helper.hpp"
 class NEATRunner{
+public:
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
     static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static const int SIM_LIFETIME =1000; // each genome gets 1000 frames 
@@ -12,9 +13,8 @@ class NEATRunner{
     COMP_THRESHOLD=3.0f; 
     int globalInnvNum=0;
     int genNum=0; 
-    int totalAdjFit; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
+    double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
     Species * bestPerformingSpecies = nullptr; 
-public:
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  

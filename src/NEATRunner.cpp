@@ -260,6 +260,7 @@ void NEATRunner::crossover()
         float proportion= species.sumOfAdjFits/((float) totalAdjFit); 
         int numOffSpring= floor(proportion*POP_SIZE); //round down 
         
+        
         // if the case happens that it's greater than the max, set to it 
         if (numOffSpring > spotsLeft) numOffSpring = spotsLeft; 
 
@@ -310,7 +311,7 @@ void NEATRunner::crossover()
         }
 
 
-
+        
     }
     // if there are left over spots give to the best species 
 
@@ -320,6 +321,9 @@ void NEATRunner::crossover()
         Genome offspring = performCrossover(parent1, parent2);
         nextGen.push_back(offspring); 
     }
+
+    // set current gen = to next gen 
+    genomes = nextGen; 
 }
 
 
@@ -388,7 +392,7 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 
     //(delta = c1*E/N +c2*D/N + c3*W)
     double N = std::max(parent1Size, parent2Size); 
-    if (N < 20) N = 1.0;  // normalization from paper
+    //if (N < 20) N = 1.0;  // normalization from paper
     if(numMatchingWeights>0) avgWeightDiff/=numMatchingWeights; 
 
     return C1*numExcess/N + C2*numDisjoint/N + C3*avgWeightDiff; 
@@ -446,14 +450,40 @@ void NEATRunner::speciate()
             species.bestFitness = std::max(genome.fitness, species.bestFitness) ; 
             species.sumOfAdjFits += genome.adjustedFitness; 
         }
-        totalAdjFit+=species.sumOfAdjFits; 
+        
+        totalAdjFit += species.sumOfAdjFits; 
         // TODO: store the species with the best adjusted fitness for excess
         if (!bestPerformingSpecies || species.sumOfAdjFits > bestPerformingSpecies->sumOfAdjFits)
             bestPerformingSpecies = &species;  
+        
+
     }
 
 }
 
+/* 3.1 Genetic Encoding (pg 107)
+Mutations can change connection weights or network's structure 
+Setting connections to a new random value
+Perturbing connections 
+Structural Mutation:
+Adding new node 
+Adding new connection
+*/
+
+// TODO: need functionality to add recurrent connections as well
+// connects two previously un connected nodes with a new random connection  
+void addConnectionMutation(Genome &genome){
+
+}
+// Existing connection is split and a new node is add in between 
+void addNodeMutation(Genome &genome){
+
+}
 void NEATRunner::mutate()
-{
+{   
+    // make sure the champ of each species isn't affected
+    // if a genome's raw fitness == the best fitness of its species then it is the champ of that species
+    // we have to go through each genome instead of each species since newly created offspring don't have a set species yet
+    std::unordered_set<int>  champSelected; // keep track if champ has been selected for a certain species 
+
 }
