@@ -141,9 +141,111 @@ Genome& NEATRunner::selectParentFromSpecies(Species& species) {
     
     return species.members.front(); // fallback
 }
+
+bool approxEqual(double a, double b, double epsilon = 1e-6) {
+    return std::abs(a - b) < epsilon;
+}
+// THE CONNECTIONS ARE ASSUMED TO BE SORTED 
 Genome NEATRunner::performCrossover(Genome& parent1, Genome& parent2 ){
-    // Matching genes are inherited randomly, disjoint and excess genes are inherited from most fit parent 
-    // make the calc comp distance function return 
+    Genome offspring;
+    
+    // Determine which parent is more fit
+    bool parent1Fitter = parent1.fitness > parent2.fitness;
+    bool equalFitness = approxEqual(parent1.fitness, parent2.fitness);
+    
+    std::unordered_set<int> requiredNodeIds; // Track which nodes we need
+    
+    // Sort connections by innovation number
+    auto p1Conns = parent1.connections;
+    auto p2Conns = parent2.connections;
+    
+    
+    int i = 0, j = 0;
+    
+    // Crossover connections
+    while(i < p1Conns.size() || j < p2Conns.size()) {
+        Connection* conn1 = (i < p1Conns.size()) ? &p1Conns[i] : nullptr;
+        Connection* conn2 = (j < p2Conns.size()) ? &p2Conns[j] : nullptr;
+        
+        Connection inheritedConn;
+        bool inherit = false;
+        
+        // Both parents have this gene (matching)
+        if(conn1 && conn2 && conn1->innvNum == conn2->innvNum) {
+            // Randomly inherit from either parent
+            inheritedConn = (getRandNum(0, 1) < 0.5) ? *conn1 : *conn2;
+            
+            // 75% chance to disable if disabled in either parent
+            if(!conn1->isEnabled || !conn2->isEnabled) {
+                if(getRandNum(0, 1) < 0.75) {
+                    inheritedConn.isEnabled = false;
+                }
+            }
+            inherit = true;
+            i++; j++;
+        }
+        // Disjoint/excess gene
+        else {
+            if(equalFitness) {
+                // Random inheritance
+                if(conn1 && (!conn2 || conn1->innvNum < conn2->innvNum)) {
+                    if(getRandNum(0, 1) < 0.5) {
+                        inheritedConn = *conn1;
+                        inherit = true;
+                    }
+                    i++;
+                } else {
+                    if(getRandNum(0, 1) < 0.5) {
+                        inheritedConn = *conn2;
+                        inherit = true;
+                    }
+                    j++;
+                }
+            } else {
+                // Inherit from fitter parent
+                if(parent1Fitter) {
+                    if(conn1 && (!conn2 || conn1->innvNum < conn2->innvNum)) {
+                        inheritedConn = *conn1;
+                        inherit = true;
+                        i++;
+                    } else {
+                        j++;
+                    }
+                } else {
+                    if(conn2 && (!conn1 || conn2->innvNum < conn1->innvNum)) {
+                        inheritedConn = *conn2;
+                        inherit = true;
+                        j++;
+                    } else {
+                        i++;
+                    }
+                }
+            }
+        }
+        
+        if(inherit) {
+            offspring.connections.push_back(inheritedConn);
+            requiredNodeIds.insert(inheritedConn.inId);
+            requiredNodeIds.insert(inheritedConn.outId);
+        }
+    }
+    
+    // Now add all required nodes from both parents
+    std::unordered_map<int, Node> allNodes;
+    for(const Node& node : parent1.nodes) {
+        allNodes[node.id] = node;
+    }
+    for(const Node& node : parent2.nodes) {
+        allNodes[node.id] = node;
+    }
+    
+    for(int nodeId : requiredNodeIds) {
+        if(allNodes.count(nodeId)) {
+            offspring.nodes.push_back(allNodes[nodeId]);
+        }
+    }
+    
+    return offspring;
 }
 Species& NEATRunner::selectRandomSpecies(){
     int indx = std::floor(getRandNum(0, speciesList.size())); 
@@ -212,7 +314,12 @@ void NEATRunner::crossover()
     }
     // if there are left over spots give to the best species 
 
-    // add the genomes to their species 
+    for(int i = spotsLeft; i>0; i--){
+        Genome& parent1 = selectParentFromSpecies(*bestPerformingSpecies);
+        Genome& parent2 = selectParentFromSpecies(*bestPerformingSpecies);
+        Genome offspring = performCrossover(parent1, parent2);
+        nextGen.push_back(offspring); 
+    }
 }
 
 
@@ -340,7 +447,9 @@ void NEATRunner::speciate()
             species.sumOfAdjFits += genome.adjustedFitness; 
         }
         totalAdjFit+=species.sumOfAdjFits; 
-        // TODO: store the species with the best adjusted fitness for excess 
+        // TODO: store the species with the best adjusted fitness for excess
+        if (!bestPerformingSpecies || species.sumOfAdjFits > bestPerformingSpecies->sumOfAdjFits)
+            bestPerformingSpecies = &species;  
     }
 
 }

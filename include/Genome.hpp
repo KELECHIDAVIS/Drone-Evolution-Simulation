@@ -24,6 +24,7 @@ struct Connection{ // connects two nodes with a weight.
     bool isEnabled;
     bool isRecurrent; 
     int innvNum; // innovation number; the historical marker for when this connection appeared   
+    Connection(); 
     Connection(int in, int out, double w, bool en, int innov,bool rec)
         : inId(in), outId(out), weight(w), isEnabled(en),  innvNum(innov),isRecurrent(rec) {}
 }; 
@@ -37,6 +38,9 @@ struct Genome{ // the blueprint to build the neural network
     void addNode(NodeType type) {
         int newId = nodes.empty() ? 0 : (nodes.back().id + 1);
         nodes.emplace_back(newId, type);
+    }
+    void addNode(NodeType type, int id ) {
+        nodes.emplace_back(id, type);
     }
     // Add a connection with a new global innovation number
     void addConnection(int in, int out, double weight, bool enabled, int innovation, bool isRecurrent) {

@@ -13,6 +13,7 @@ class NEATRunner{
     int globalInnvNum=0;
     int genNum=0; 
     int totalAdjFit; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
+    Species * bestPerformingSpecies = nullptr; 
 public:
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
