@@ -3,13 +3,20 @@
 #include "Environment.hpp"
 #include "helper.hpp"
 class NEATRunner{
-public:
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
     static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static const int SIM_LIFETIME =1000; // each genome gets 1000 frames 
+    static const int SIM_LIFETIME =1000; // each genome gets 1000 frames  
+    static constexpr double WEIGHT_MUTATION_RATE = 0.8;
+    static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
+    static constexpr double PERTURB_DELTA = 0.1;
+    static constexpr double WEIGHT_MIN = -1.0;
+    static constexpr double WEIGHT_MAX = 1.0;
+    static constexpr double ADD_NODE_RATE = 0.03;
+    static constexpr double ADD_LINK_RATE = 0.05; // use 0.3 for very large pops
+
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
-     C2=1.0f, // how much weight disjoint genes have  
-     C3=.4f, // how much weight weight differences have 
+    C2=1.0f, // how much weight disjoint genes have  
+    C3=.4f, // how much weight weight differences have 
     COMP_THRESHOLD=3.0f; 
     int globalInnvNum=0;
     int genNum=0; 
@@ -21,6 +28,7 @@ public:
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
     std::vector<Species> speciesList; 
     
+public:
     /* initialization: 
         all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs 
         (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
@@ -39,8 +47,12 @@ public:
 
     double calcCompDistance(Genome& parent1, Genome& parent2); 
     
-    void speciate(); 
+    void speciate();
+    void addConnectionMutation(Genome &genome);
 
+    void addNodeMutation(Genome &genome);
+
+    void perturbConnections(Genome &genome);
 
     void mutate();
 

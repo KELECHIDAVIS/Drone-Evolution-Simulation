@@ -35,7 +35,7 @@ Genome NEATRunner::initGenome() // at the start of the sim
     for (int in = 0; in <= 4; ++in) {
         for (int out = 5; out <= 6; ++out) {
             if (getRandNum(0, 1) < 0.5) {
-                createConnection(in, out, getRandNum(-1, 1), true, false, genome);
+                createConnection(in, out, getRandNum(WEIGHT_MIN, WEIGHT_MAX), true, false, genome);
             }
         }
     }
@@ -459,6 +459,11 @@ void NEATRunner::speciate()
 
     }
 
+    if (totalAdjFit <= 0.0) {
+        std::cerr << "!! totalAdjFit was zero, setting totalAdjFit = 1 .\n";
+        totalAdjFit = 1.0;
+    }
+
 }
 
 /* 3.1 Genetic Encoding (pg 107)
@@ -472,18 +477,81 @@ Adding new connection
 
 // TODO: need functionality to add recurrent connections as well
 // connects two previously un connected nodes with a new random connection  
-void addConnectionMutation(Genome &genome){
+void NEATRunner::addConnectionMutation(Genome &genome){
+    // create map for each node that shows the connections it has to other nodes 
+    std::unordered_map<int, std::unordered_set<int>> existingConnections; 
+    for(Connection & conn: genome.connections){
+        
+    } 
 
 }
 // Existing connection is split and a new node is add in between 
-void addNodeMutation(Genome &genome){
+void NEATRunner::addNodeMutation(Genome &genome){
+    std::vector<int> indices(genome.connections.size()); 
+    std::iota(indices.begin(), indices.end(), 0 ); 
+    std::shuffle(indices.begin(), indices.end(), getRNG());
+    
+    for(int indx : indices){
+        Connection &conn = genome.connections[indx]; 
 
+        if(!conn.isEnabled) continue; 
+
+        genome.addNode(NodeType::HIDDEN); 
+        Node &newNode = genome.nodes.back(); 
+
+        conn.isEnabled =false; 
+
+        //TODO: make sure this works with recurrent connections 
+        createConnection(conn.inId, newNode.id, 1.0, true, conn.isRecurrent, genome); 
+        createConnection(newNode.id, conn.outId, conn.weight, true, conn.isRecurrent, genome); 
+
+    }
+
+}
+// each weight has a 90% chance of being uniformly perturbed and a 10% chance of being assigned new random val 
+void NEATRunner::perturbConnections(Genome &genome){
+    for(Connection & conn: genome.connections){
+        if(getRandNum(0,1)< WEIGHT_PERTURB_CHANCE){
+            double delta = getRandNum(-.2, 2 ); 
+            conn.weight += delta; 
+            conn.weight = std::clamp(conn.weight, WEIGHT_MIN, WEIGHT_MAX); // keep within range
+        }else{
+            conn.weight = getRandNum(WEIGHT_MIN,WEIGHT_MAX); 
+        }
+    }
 }
 void NEATRunner::mutate()
 {   
     // make sure the champ of each species isn't affected
-    // if a genome's raw fitness == the best fitness of its species then it is the champ of that species
-    // we have to go through each genome instead of each species since newly created offspring don't have a set species yet
-    std::unordered_set<int>  champSelected; // keep track if champ has been selected for a certain species 
+    // if a genome's raw fitness == the best fitness of its species && there champ hasn't been selected yet then it is the champ of that species
+    // we have to go through each genome instead of each species since newly created offspring don't have a set species yet 
+    std::unordered_set<int>  champSelected; // keep track if champ has been selected for a certain speciesid 
+    
+    for (Genome &genome: genomes){
+        // check champ 
+        if(genome.speciesID >=0){
+            Species &species = speciesList[genome.speciesID]; 
+            
+            if (species.members.size()>=5 && champSelected.find(species.id) == champSelected.end() && approxEqual(species.bestFitness ,genome.fitness)){
+                champSelected.insert(species.id); 
+                continue ; // do not mutate this genome 
+            }
+
+            if (getRandNum(0, 1) < WEIGHT_MUTATION_RATE){
+                perturbConnections(genome); 
+            }
+
+            if(getRandNum(0,1 ) < ADD_LINK_RATE){
+                addConnectionMutation(genome); 
+            }
+
+            if(getRandNum(0,1 )< ADD_NODE_RATE){
+                addNodeMutation(genome); 
+            }
+        }
+
+
+
+    }
 
 }
