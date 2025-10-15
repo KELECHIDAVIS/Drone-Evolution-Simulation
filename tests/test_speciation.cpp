@@ -194,7 +194,7 @@ void testSpeciesAssignment() {
         std::cout << "    Species " << species.id << ": " 
                   << species.members.size() << " members\n";
         std::cout << "      Best fitness: " << species.bestFitness << "\n";
-        std::cout << "      Avg fitness: " << species.speciesFitness << "\n";
+        std::cout << "      Avg fitness: " << species.sumOfAdjFits << "\n";
         
         assert(species.members.size() > 0);
         
@@ -273,7 +273,7 @@ void testSpeciesMetrics() {
         std::cout << "    Species " << species.id << ":\n";
         std::cout << "      Members: " << species.members.size() << "\n";
         std::cout << "      Best fitness: " << species.bestFitness << "\n";
-        std::cout << "      Avg fitness: " << species.speciesFitness << "\n";
+        std::cout << "      Avg fitness: " << species.sumOfAdjFits << "\n";
         
         // Calculate expected values
         double maxFit = 0;
@@ -288,7 +288,7 @@ void testSpeciesMetrics() {
         std::cout << "      Expected avg: " << expectedAvg << "\n";
         
         assert(approxEqual(species.bestFitness, maxFit));
-        assert(approxEqual(species.speciesFitness, expectedAvg));
+        assert(approxEqual(species.sumOfAdjFits, expectedAvg));
     }
     
     std::cout << "\n  ✓ Species metrics test passed!\n";

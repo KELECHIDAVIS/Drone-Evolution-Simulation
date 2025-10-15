@@ -11,6 +11,7 @@ enum NodeType{
 struct Node{ // at each node that isn't an input or bias, their will be an activation of the resulting value 
     int id; // starts at 0
     NodeType type; 
+    Node() : id(-1), type(NodeType::HIDDEN) {}
     Node(int i , NodeType t): 
     id(i), type(t){}
 }; 
@@ -24,7 +25,7 @@ struct Connection{ // connects two nodes with a weight.
     bool isEnabled;
     bool isRecurrent; 
     int innvNum; // innovation number; the historical marker for when this connection appeared   
-    Connection(); 
+    Connection() : inId(-1), outId(-1), weight(0.0), isEnabled(true), innvNum(-1), isRecurrent(false) {}
     Connection(int in, int out, double w, bool en, int innov,bool rec)
         : inId(in), outId(out), weight(w), isEnabled(en),  innvNum(innov),isRecurrent(rec) {}
 }; 

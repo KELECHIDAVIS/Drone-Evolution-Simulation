@@ -142,7 +142,7 @@ Genome& NEATRunner::selectParentFromSpecies(Species& species) {
     return species.members.front(); // fallback
 }
 
-bool approxEqual(double a, double b, double epsilon = 1e-6) {
+bool NEATRunner::approxEqual(double a, double b, double epsilon = 1e-6) {
     return std::abs(a - b) < epsilon;
 }
 // THE CONNECTIONS ARE ASSUMED TO BE SORTED 

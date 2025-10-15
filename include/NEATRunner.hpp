@@ -46,6 +46,8 @@ public:
 
     Genome &selectParentFromSpecies(Species &species);
 
+    bool approxEqual(double a, double b, double epsilon);
+
     Genome performCrossover(Genome &parent1, Genome &parent2);
 
     /*crossover:
