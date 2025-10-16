@@ -152,9 +152,7 @@ Genome NEATRunner::performCrossover(Genome& parent1, Genome& parent2 ){
     // Determine which parent is more fit
     bool parent1Fitter = parent1.fitness > parent2.fitness;
     bool equalFitness = approxEqual(parent1.fitness, parent2.fitness);
-    
-    std::unordered_set<int> requiredNodeIds; // Track which nodes we need
-    
+        
     // Sort connections by innovation number
     auto p1Conns = parent1.connections;
     auto p2Conns = parent2.connections;
@@ -225,24 +223,27 @@ Genome NEATRunner::performCrossover(Genome& parent1, Genome& parent2 ){
         
         if(inherit) {
             offspring.connections.push_back(inheritedConn);
-            requiredNodeIds.insert(inheritedConn.inId);
-            requiredNodeIds.insert(inheritedConn.outId);
         }
     }
     
     // Now add all required nodes from both parents
+    // both parents should have the same bias, input, and output nodes. the differring nodes are 
+    //nodes unlike innvNums should be sequential and range from id = 0 to nodes.size() 
     std::unordered_map<int, Node> allNodes;
+    int parentMax= INT_MIN, parentMin = INT_MAX; 
     for(const Node& node : parent1.nodes) {
         allNodes[node.id] = node;
+        parentMax = std::max(parentMax , node.id); 
+        parentMin = std::min(parentMin , node.id); 
     }
     for(const Node& node : parent2.nodes) {
         allNodes[node.id] = node;
+        parentMax = std::max(parentMax , node.id); 
+        parentMin = std::min(parentMin , node.id); 
     }
     
-    for(int nodeId : requiredNodeIds) {
-        if(allNodes.count(nodeId)) {
-            offspring.nodes.push_back(allNodes[nodeId]);
-        }
+    for(int i =parentMin; i<= parentMax; i++){
+        offspring.addNode(allNodes[i].type, i); 
     }
     
     return offspring;
@@ -452,7 +453,7 @@ void NEATRunner::speciate()
         }
         
         totalAdjFit += species.sumOfAdjFits; 
-        // TODO: store the species with the best adjusted fitness for excess
+        
         if (!bestPerformingSpecies || species.sumOfAdjFits > bestPerformingSpecies->sumOfAdjFits)
             bestPerformingSpecies = &species;  
         
@@ -478,15 +479,40 @@ Adding new connection
 
 // connects two previously un connected nodes with a new random connection  
 void NEATRunner::addConnectionMutation(Genome &genome){
+    //if genome only has one node return 
+    if(genome.nodes.size() <=1 ) return;  
     // create map for each node that shows the connections it has to other nodes 
     std::unordered_map<int, std::unordered_set<int>> existingConnections; 
-    
+    std::vector<int> nodeIndices ; 
     // init map for every node;  nodes should be 0->genome.nodes.size() 
-    
+    for(Node & node: genome.nodes){
+        existingConnections[node.id];
+        nodeIndices.push_back(node.id);  
+    }
     for(Connection & conn: genome.connections){
         existingConnections[conn.inId].insert(conn.outId); 
     } 
- 
+
+    // pick random node as input
+    int randIndx = floor(getRandNum(0, nodeIndices.size()));  
+    int inId = nodeIndices[randIndx];
+    nodeIndices.erase(nodeIndices.begin() + randIndx);
+    int outId = -1 ; 
+
+    // go through the rest of the list until you find a node the inId isn't connected to 
+    for(int i= 0; i< nodeIndices.size(); i++){
+        if(existingConnections[inId].find(nodeIndices[i]) != existingConnections[inId].end())
+            continue; 
+        // save for out id  
+        outId= nodeIndices[i]; 
+    }
+
+    if (outId != -1){ // create new connection 
+        // first figure out if the connection would be recurrent 
+        // if out node has outgoing connection to inNode it's recurrent 
+        bool isReccurrent = existingConnections[outId].find(inId) != existingConnections[outId].end(); 
+        createConnection(inId, outId, getRandNum(WEIGHT_MIN, WEIGHT_MAX), true, isReccurrent, genome); 
+    }
 }
 // Existing connection is split and a new node is add in between 
 void NEATRunner::addNodeMutation(Genome &genome){
@@ -504,7 +530,6 @@ void NEATRunner::addNodeMutation(Genome &genome){
 
         conn.isEnabled =false; 
 
-        //TODO: make sure this works with recurrent connections 
         createConnection(conn.inId, newNode.id, 1.0, true, conn.isRecurrent, genome); 
         createConnection(newNode.id, conn.outId, conn.weight, true, conn.isRecurrent, genome); 
 
@@ -552,9 +577,6 @@ void NEATRunner::mutate()
                 addNodeMutation(genome); 
             }
         }
-
-
-
     }
 
 }
