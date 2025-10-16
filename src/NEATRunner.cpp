@@ -475,15 +475,18 @@ Adding new node
 Adding new connection
 */
 
-// TODO: need functionality to add recurrent connections as well
+
 // connects two previously un connected nodes with a new random connection  
 void NEATRunner::addConnectionMutation(Genome &genome){
     // create map for each node that shows the connections it has to other nodes 
     std::unordered_map<int, std::unordered_set<int>> existingConnections; 
+    
+    // init map for every node;  nodes should be 0->genome.nodes.size() 
+    
     for(Connection & conn: genome.connections){
-        
+        existingConnections[conn.inId].insert(conn.outId); 
     } 
-
+ 
 }
 // Existing connection is split and a new node is add in between 
 void NEATRunner::addNodeMutation(Genome &genome){

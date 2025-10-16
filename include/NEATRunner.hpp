@@ -3,6 +3,7 @@
 #include "Environment.hpp"
 #include "helper.hpp"
 class NEATRunner{
+public:
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
     static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static const int SIM_LIFETIME =1000; // each genome gets 1000 frames  
@@ -28,7 +29,7 @@ class NEATRunner{
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
     std::vector<Species> speciesList; 
     
-public:
+
     /* initialization: 
         all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs 
         (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
