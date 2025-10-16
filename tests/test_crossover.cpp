@@ -366,7 +366,7 @@ void testResearchPapersCrossover(){
         {1,4, .5, 3, true},
         {4,3, .5, 4,true},
         {0,4, .5, 7,true},
-    }); 
+    },1); 
     Genome g2 = createTestGenome3({
         {0,3, .5, 0, true},
         {1,3, .5, 1, false},
