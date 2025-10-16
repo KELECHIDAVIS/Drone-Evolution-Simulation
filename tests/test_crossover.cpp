@@ -27,6 +27,41 @@ Genome createTestGenome(const std::vector<std::tuple<int, int, double, int>>& co
     return genome;
 }
 
+Genome createTestGenome2(const std::vector<std::tuple<int, int, double, int, bool>>& connections, double fitness = 0.0) {
+    Genome genome;
+    
+    genome.addNode(NodeType::INPUT);   // 0
+    genome.addNode(NodeType::INPUT);   // 1
+    genome.addNode(NodeType::INPUT);   // 2
+    genome.addNode(NodeType::OUTPUT);  // 3
+    genome.addNode(NodeType::HIDDEN);  // 4
+    
+    for (const auto& [in, out, weight, innov, enabled] : connections) {
+        genome.addConnection(in, out, weight, enabled, innov, false);
+    }
+    
+    genome.fitness = fitness;
+    return genome;
+}
+
+Genome createTestGenome3(const std::vector<std::tuple<int, int, double, int, bool>>& connections, double fitness = 0.0) {
+    Genome genome;
+    
+    genome.addNode(NodeType::INPUT);   // 0
+    genome.addNode(NodeType::INPUT);   // 1
+    genome.addNode(NodeType::INPUT);   // 2
+    genome.addNode(NodeType::OUTPUT);  // 3
+    genome.addNode(NodeType::HIDDEN);  // 4
+    genome.addNode(NodeType::HIDDEN);  // 5
+    
+    for (const auto& [in, out, weight, innov, enabled] : connections) {
+        genome.addConnection(in, out, weight, true, innov, false);
+    }
+    
+    genome.fitness = fitness;
+    return genome;
+}
+
 void testPopulationSizePreservation() {
     std::cout << "\n✅ Testing Population Size Preservation...\n";
     
@@ -321,7 +356,37 @@ void testInterspeciesMating() {
     
     std::cout << "  ✓ Interspecies mating code executed without errors!\n";
 }
+
 //TODO: make sure crossover works by using the genomes in the paper and testing if I get the same result when they are both the same fit 
+void testResearchPapersCrossover(){
+    Genome g1 = createTestGenome2({
+        {0,3, .5, 0, true},
+        {1,3, .5, 1, false},
+        {2,3, .5, 2, true},
+        {1,4, .5, 3, true},
+        {4,3, .5, 4,true},
+        {0,4, .5, 7,true},
+    }); 
+    Genome g2 = createTestGenome3({
+        {0,3, .5, 0, true},
+        {1,3, .5, 1, false},
+        {2,3, .5, 2, true},
+        {1,4, .5, 3, true},
+        {4,3, .5, 4,false},
+        {4,5, .5, 5,true},
+        {5,3, .5, 6,true},
+        {2,4, .5, 8,true},
+        {0,5, .5, 9,true},
+    }, 0); 
+
+    NEATRunner runner; 
+    Genome offspring = runner.performCrossover(g1, g2);
+    
+    for (Connection & conn : offspring.connections){
+        std::cout<<"Innv: "<< conn.innvNum+1<<", "<<conn.inId+1<<"->"<<conn.outId+1<<"|  "; 
+    }
+}
+
 int main() {
     std::cout << "========================================\n";
     std::cout << "        CROSSOVER TESTS (NEAT)         \n";
@@ -335,7 +400,7 @@ int main() {
     testRemainderAllocation();
     testCrossoverMechanics();
     testInterspeciesMating();
-    
+    testResearchPapersCrossover(); 
     std::cout << "\n========================================\n";
     std::cout << "🎉 ALL CROSSOVER TESTS COMPLETED!\n";
     std::cout << "========================================\n";
