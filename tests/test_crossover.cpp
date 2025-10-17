@@ -366,7 +366,7 @@ void testResearchPapersCrossover(){
         {1,4, .5, 3, true},
         {4,3, .5, 4,true},
         {0,4, .5, 7,true},
-    },1); 
+    },0); 
     Genome g2 = createTestGenome3({
         {0,3, .5, 0, true},
         {1,3, .5, 1, false},
@@ -381,10 +381,21 @@ void testResearchPapersCrossover(){
 
     NEATRunner runner; 
     Genome offspring = runner.performCrossover(g1, g2);
+
+    std::cout<<"Parent 1:"<<std::endl; 
+    for (Connection & conn : g1.connections){
+        std::cout<<"Innv: "<< conn.innvNum+1<<", "<<conn.inId+1<<"->"<<conn.outId+1<<"|  "; 
+    }std::cout<<std::endl; 
     
+    std::cout<<"Parent 2:"<<std::endl; 
+    for (Connection & conn : g2.connections){
+        std::cout<<"Innv: "<< conn.innvNum+1<<", "<<conn.inId+1<<"->"<<conn.outId+1<<"|  "; 
+    }std::cout<<std::endl; 
+    
+    std::cout<<"Offspring:"<<std::endl; 
     for (Connection & conn : offspring.connections){
         std::cout<<"Innv: "<< conn.innvNum+1<<", "<<conn.inId+1<<"->"<<conn.outId+1<<"|  "; 
-    }
+    }std::cout<<std::endl; 
 }
 
 int main() {

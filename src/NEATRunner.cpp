@@ -185,18 +185,14 @@ Genome NEATRunner::performCrossover(Genome& parent1, Genome& parent2 ){
         // Disjoint/excess gene
         else {
             if(equalFitness) {
-                // Random inheritance
+                // if the fitnesses are equal inherit all disjoint and excess
                 if(conn1 && (!conn2 || conn1->innvNum < conn2->innvNum)) {
-                    if(getRandNum(0, 1) < 0.5) {
-                        inheritedConn = *conn1;
-                        inherit = true;
-                    }
+                    inheritedConn = *conn1;
+                    inherit = true;
                     i++;
                 } else {
-                    if(getRandNum(0, 1) < 0.5) {
-                        inheritedConn = *conn2;
-                        inherit = true;
-                    }
+                    inheritedConn = *conn2;
+                    inherit = true;
                     j++;
                 }
             } else {
