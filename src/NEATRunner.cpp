@@ -417,16 +417,23 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 
     return C1*numExcess/N + C2*numDisjoint/N + C3*avgWeightDiff; 
 }
+void NEATRunner::keepTrackOfGenomeStats(Genome &genome){
+    
+}
 void NEATRunner::speciate()
 {
 
     // run through each genome, compare it's compatibility to each species, decide its species; 
     // if there are no new species create one 
+    // keep track of the stats of the genomes 
     for(Genome &genome: genomes){
 
         // SORT CONNECTIONS IN GENOME TO MAKE SPECIATION EASIER
         std::sort(genome.connections.begin(), genome.connections.end(), 
         [](const Connection& a, const Connection& b) { return a.innvNum < b.innvNum; });
+
+        //keep track of stats and connections 
+        keepTrackOfGenomeStats(genome); 
 
         bool foundMatch = false; 
 

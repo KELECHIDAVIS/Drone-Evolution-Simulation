@@ -22,7 +22,13 @@ public:
     int globalInnvNum=0;
     int genNum=0; 
     double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
+    int gensSinceInnovation=0; 
     Species * bestPerformingSpecies = nullptr; 
+    Species * worstPerformingSpecies = nullptr; 
+    Genome * bestAdjGenome = nullptr; // raw_fit/species_size; helps innovative genomes from worse species be more competitive 
+    Genome * bestRawGenome = nullptr; 
+    Genome * worstRawGenome= nullptr; 
+    Genome * worstAdjGenome = nullptr; 
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  
@@ -47,8 +53,9 @@ public:
 
     // steps of NEAT: speciation, mutation, then crossover 
 
-    double calcCompDistance(Genome& parent1, Genome& parent2); 
-    
+    double calcCompDistance(Genome& parent1, Genome& parent2);
+    void keepTrackOfGenomeStats(Genome &genome);
+
     void speciate();
     void addConnectionMutation(Genome &genome);
 
