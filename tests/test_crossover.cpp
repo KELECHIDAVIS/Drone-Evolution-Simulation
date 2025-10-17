@@ -357,7 +357,6 @@ void testInterspeciesMating() {
     std::cout << "  ✓ Interspecies mating code executed without errors!\n";
 }
 
-//TODO: make sure crossover works by using the genomes in the paper and testing if I get the same result when they are both the same fit 
 void testResearchPapersCrossover(){
     Genome g1 = createTestGenome2({
         {0,3, .5, 0, true},

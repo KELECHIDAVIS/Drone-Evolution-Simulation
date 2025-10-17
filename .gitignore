@@ -4,3 +4,16 @@ out
 .idea
 .vs
 .vscode
+
+#python 
+analysis/__pycache__/
+analysis/*.pyc
+*.egg-info/
+.venv/
+venv/
+
+#data outputs 
+simulation_data/*.csv
+simulation_data/*.json
+simulation_data/*.png
+simulation_data/*.html
