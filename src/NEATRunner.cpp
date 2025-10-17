@@ -40,7 +40,6 @@ Genome NEATRunner::initGenome() // at the start of the sim
         }
     }
 
-
     return genome; 
 }
 
@@ -57,6 +56,30 @@ void NEATRunner::createConnection(int in, int out, double weight, bool enabled, 
         globalInnvNum++;  
     }
     genome.addConnection(in, out, weight, enabled, innvNum,isRecurrent); 
+}
+
+Genome NEATRunner::createGenome(int numInputs, int numBiases, int numOutputs, const std::vector<std::tuple<int, int, double, bool, int, bool>> &connections)
+{
+    Genome genome;
+    
+    for(int i = 0; i< numInputs; i++){
+        genome.addNode(NodeType::INPUT);   
+    }
+
+    for(int i = 0; i< numBiases; i++){
+        genome.addNode(NodeType::BIAS);   
+    }
+    
+    for(int i = 0; i< numOutputs; i++){
+        genome.addNode(NodeType::OUTPUT);   
+    }
+    
+    
+    for (const auto& [in, out, weight, enabled, innov, recurrent ] : connections) {
+        genome.addConnection(in, out, weight, enabled, innov, recurrent);
+    }
+    
+    return genome;
 }
 
 void NEATRunner::runGeneration()
@@ -528,6 +551,8 @@ void NEATRunner::addNodeMutation(Genome &genome){
 
         createConnection(conn.inId, newNode.id, 1.0, true, conn.isRecurrent, genome); 
         createConnection(newNode.id, conn.outId, conn.weight, true, conn.isRecurrent, genome); 
+
+        break; 
 
     }
 

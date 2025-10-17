@@ -41,6 +41,7 @@ public:
     // creates a connection on a genome and adheres with the innovation tracker
     void createConnection(int in, int out , double weight, bool enabled, bool isRecurrent, Genome &genome); 
 
+    Genome createGenome (int numInputs, int numBiases, int numOutputs, const std::vector<std::tuple<int, int, double, bool, int, bool>>& connections); 
 
     void runGeneration(); 
 
