@@ -1,29 +1,48 @@
-// build and run 
-cmake --preset debug; cmake --build --preset debug; ./build/bin/DroneEvo.exe
+// debug build 
 
-// delete and rebuild 
-Remove-Item -Recurse -Force build; cmake --preset debug; cmake --build --preset debug; ./build/bin/DroneEvo.exe
+cd build
+cmake .. --preset debug
+cmake --build . --config Debug
+.\bin\DroneEvo.exe
 
-// build and run tests
-cmake --preset debug; cmake --build --preset debug; ctest --preset debug --output-on-failure
 
-// simple build run
-cd build; cmake --build; .\bin\Drone.exe
+// release build 
 
-# Full build and test
-mkdir build && cd build
-cmake ..
-cmake --build .
-ctest
+cd build-release
+cmake .. --preset release
+cmake --build . --config Release
+.\bin\DroneEvo.exe
 
-# Run only recurrent tests
-ctest -R RecurrentNEAT
 
-# Verbose output (see all test output)
-ctest -R RecurrentNEAT --verbose
+// if folders alr exist: 
 
-# Show output only on failure
-ctest --output-on-failure
+//debug: 
 
-# Run by label
-ctest -L recurrent
+cd build
+cmake --build . --config Debug
+.\bin\DroneEvo.exe
+
+// release
+
+cd build-release
+cmake --build . --config Release
+.\bin\DroneEvo.exe
+
+
+//clean and build from scratch 
+
+// debug
+rmdir -r build
+mkdir build
+cd build
+cmake .. --preset debug
+cmake --build . --config Debug
+.\bin\DroneEvo.exe
+
+//release
+rm -r build-release
+mkdir build-release
+cd build-release
+cmake .. --preset release
+cmake --build . --config Release
+.\bin\DroneEvo.exe

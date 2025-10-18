@@ -8,14 +8,22 @@
   "configurePresets": [
     {
       "name": "debug",
-      "displayName": "MinGW Debug",
-      "description": "Configure with MinGW Makefiles (Debug build)",
-      "generator": "MinGW Makefiles",
+      "displayName": "MSVC Debug",
+      "description": "Configure with MSVC (Debug build)",
+      "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "MSVC Release",
+      "description": "Configure with MSVC (Release build)",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],
@@ -23,6 +31,10 @@
     {
       "name": "debug",
       "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
     }
   ]
 }
