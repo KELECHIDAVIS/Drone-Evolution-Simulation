@@ -1,6 +1,6 @@
 #pragma once
 #include <vector> 
-#include "json.hpp"
+#include <json.hpp>
 // genomes include node genes and connection genes that later determine the phenotype of the agent (neural network)
 
 enum NodeType{

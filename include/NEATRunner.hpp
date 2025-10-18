@@ -6,6 +6,7 @@
 #include <fstream>
 #include <filesystem>
 
+
 class NEATRunner{
 public:
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
@@ -30,10 +31,10 @@ public:
     int gensSinceInnovation=0; 
     Species * bestPerformingSpecies = nullptr; 
     Species * worstPerformingSpecies = nullptr; 
-    Genome * bestAdjGenome = nullptr; // raw_fit/species_size; helps innovative genomes from worse species be more competitive 
-    Genome * bestRawGenome = nullptr; 
-    Genome * worstRawGenome= nullptr; 
-    Genome * worstAdjGenome = nullptr; 
+    double bestAdjFit ; // raw_fit/species_size; helps innovative genomes from worse species be more competitive 
+    double  bestRawFit; 
+    double  worstRawFit; 
+    double  worstAdjFit; 
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  

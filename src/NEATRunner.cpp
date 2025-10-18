@@ -141,13 +141,12 @@ void NEATRunner::testOutGenomes() {
 
 void NEATRunner::saveGenerationResults()
 {
-    // Create data directory if it doesn't exist
-    std::filesystem::create_directories("data");
-
-    std::ofstream test_file("data/test.txt");
-    test_file << "Hello, this is a test\n";
-    test_file.close();
     
+    // Create data directory if it doesn't exist
+    std::filesystem::create_directories("simulation_data");
+
+    
+
     nlohmann::json gen_json; 
     gen_json["generation"] = genNum;
     for (const auto& species : speciesList) {
@@ -156,16 +155,24 @@ void NEATRunner::saveGenerationResults()
         species_json["bestFitness"] = species.bestFitness;
         for (const auto& genome : species.members) {
             nlohmann::json genome_json= genome.to_json(); 
+            species_json["members"].push_back(genome_json); // members are sorted based on performance already
         }
         gen_json["species"].push_back(species_json);
     }
-    gen_json["bestRawFit"] = bestRawGenome->fitness; 
-    gen_json["worstRawFit"] = worstRawGenome->fitness; 
+    gen_json["bestRawFit"] = bestRawFit; 
+    gen_json["worstRawFit"] = worstRawFit; 
+    gen_json["bestAdjFit"] = bestAdjFit; 
+    gen_json["worstAdjFit"] = worstAdjFit; 
     gen_json["avgRawFit"] = avgRawFit; 
 
-    // std::ofstream outFile("gen_"+std::to_string(genNum)+".json"); 
-    // outFile << gen_json.dump(gen_json.size()); 
+    gen_json["bestSpecies"] = bestPerformingSpecies->id; 
+    gen_json["worstSpecies"] = worstPerformingSpecies->id; 
     
+
+    
+    std::ofstream outFile("simulation_data/gen_"+std::to_string(genNum)+".json"); 
+    outFile << gen_json.dump(4); 
+    outFile.close(); 
     
 }
 
@@ -451,23 +458,31 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 }
 
 void NEATRunner::keepTrackOfGenomeStats(Genome &genome){
-    if(!bestAdjGenome || genome.adjustedFitness > bestAdjGenome->fitness){
-        bestAdjGenome = &genome; 
+    if(bestRawFit == 0.0 || genome.fitness > bestRawFit){
+        bestRawFit = genome.fitness; 
     }    
-    if(!worstAdjGenome || genome.adjustedFitness < worstAdjGenome->fitness){
-        worstAdjGenome= &genome; 
+    if(worstRawFit == 0.0 || genome.fitness < worstRawFit){
+        worstRawFit = genome.fitness; 
     }    
-    if(!bestRawGenome || genome.fitness > bestRawGenome->fitness){
-        bestRawGenome = &genome; 
+    if(bestAdjFit == 0.0 || genome.adjustedFitness > bestAdjFit){
+        bestAdjFit = genome.adjustedFitness; 
     }    
-    if(!worstRawGenome || genome.fitness < worstRawGenome->fitness){
-        worstRawGenome = &genome; 
-    }    
+    if(worstAdjFit == 0.0 || genome.adjustedFitness < worstAdjFit){
+        worstAdjFit = genome.adjustedFitness; 
+    }       
 }
 
 void NEATRunner::speciate()
 {
 
+    // Reset stats for this generation
+    bestRawFit = -std::numeric_limits<double>::infinity();
+    worstRawFit = std::numeric_limits<double>::infinity();
+    bestAdjFit = -std::numeric_limits<double>::infinity();
+    worstAdjFit = std::numeric_limits<double>::infinity();
+
+    bestPerformingSpecies = nullptr; 
+    worstPerformingSpecies = nullptr; 
     // run through each genome, compare it's compatibility to each species, decide its species; 
     // if there are no new species create one 
     // keep track of the stats of the genomes 
@@ -477,8 +492,7 @@ void NEATRunner::speciate()
         std::sort(genome.connections.begin(), genome.connections.end(), 
         [](const Connection& a, const Connection& b) { return a.innvNum < b.innvNum; });
 
-        //keep track 
-        keepTrackOfGenomeStats(genome); 
+        
 
         bool foundMatch = false; 
 
@@ -522,6 +536,7 @@ void NEATRunner::speciate()
             species.bestFitness = std::max(genome.fitness, species.bestFitness) ; 
             species.sumOfAdjFits += genome.adjustedFitness; 
             avgRawFit+=genome.fitness; 
+            keepTrackOfGenomeStats(genome); 
         }
         
         totalAdjFit += species.sumOfAdjFits; 
@@ -531,6 +546,8 @@ void NEATRunner::speciate()
         
         if (!worstPerformingSpecies || species.sumOfAdjFits < worstPerformingSpecies->sumOfAdjFits)
             worstPerformingSpecies = &species;  
+
+        
     }
 
     avgRawFit/= POP_SIZE; 

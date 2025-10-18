@@ -1,8 +1,9 @@
-#include <iostream> 
-#include "NEATRunner.hpp"
 
-int main(){
+#include "NEATRunner.hpp"   
+
+int main() {
+    
     NEATRunner runner; 
-    runner.saveGenerationResults(); 
-    return 0; 
+    runner.runGeneration(); 
+    return 0 ; 
 }
