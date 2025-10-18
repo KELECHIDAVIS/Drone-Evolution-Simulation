@@ -7,6 +7,25 @@
 #include <filesystem>
 
 
+struct ReplayFrame{
+    int frame; 
+    int rocketRotation; 
+    double rocketX; 
+    double rocketY; 
+    double targetX; 
+    double  targetY; 
+
+    nlohmann::json to_json() const {
+        return nlohmann::json{
+            {"frame", frame},
+            {"rotation", rocketRotation},
+            {"rocketX", rocketX},
+            {"rocketY", rocketY},
+            {"targetX", targetX},
+            {"targetY", targetY},
+        };
+    }
+}; 
 class NEATRunner{
 public:
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
@@ -29,12 +48,13 @@ public:
     double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
     double avgRawFit=0; 
     int gensSinceInnovation=0; 
-    Species * bestPerformingSpecies = nullptr; 
+    Species * bestPerformingSpecies = nullptr; // based off sum of adjusted fitness 
     Species * worstPerformingSpecies = nullptr; 
     double bestAdjFit ; // raw_fit/species_size; helps innovative genomes from worse species be more competitive 
     double  bestRawFit; 
     double  worstRawFit; 
     double  worstAdjFit; 
+    
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  
@@ -87,8 +107,11 @@ public:
 
     // this is going to make use of parallelism to test out genomes efficiently
     void testOutGenomes(); 
+    std::vector<ReplayFrame> evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay); 
     double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env); 
     // record the results for the generation 
     void saveGenerationResults(); 
 
 }; 
+
+

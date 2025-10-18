@@ -5,6 +5,7 @@ NEATRunner::NEATRunner()
 {
     for (int i =0; i< POP_SIZE; i++){
         Genome genome = initGenome(); 
+        genome.id = i ; 
         genomes.push_back(genome); 
 
         // init their neural networks
@@ -119,7 +120,38 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         env.update(0.016f);
     }
     
-    return env.score; //TODO: CHANGE FITNESS FUNCTION 
+    return env.score; //TODO: CHANGE FITNESS FUNCTION; MAKE IT SO GENOMES CAN DIE EARLIER
+}
+std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
+    env.reset();  // Make sure you have this method!
+    net.reset();
+    
+    std::vector<ReplayFrame> frames; 
+
+    for (int step = 0; step < SIM_LIFETIME; step++) {
+        if(replay){
+            ReplayFrame frame = {
+                step, 
+                env.rocket.getRotation(),
+                env.rocket.pos(0),
+                env.rocket.pos(1),
+                env.target.pos(0),
+                env.target.pos(1),
+            }; 
+            frames.push_back(frame); 
+        }
+        Eigen::VectorXd input(4);
+        input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
+        input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
+        input(2) = env.rocket.vel(0) / Rocket::MAX_VEL;
+        input(3) = env.rocket.vel(1) / Rocket::MAX_VEL;
+        
+        Eigen::VectorXd output = net.feedForward(input);
+        env.rocket.setThrust(output(0));
+        env.rocket.setRotation((int)(360 * output(1)));
+        env.update(0.016f);
+    }
+    return frames; 
 }
 
 // Parallel wrapper
@@ -168,10 +200,21 @@ void NEATRunner::saveGenerationResults()
     gen_json["bestSpecies"] = bestPerformingSpecies->id; 
     gen_json["worstSpecies"] = worstPerformingSpecies->id; 
     
-
+    gen_json["gensSinceInnovation"] = gensSinceInnovation; 
     
+    // replay the champ
+    // the best performer from the best species 
+    Genome &champ = bestPerformingSpecies->members.front(); 
+
+    std::vector<ReplayFrame> championReplayFrames= evaluateGenome(champ, networks[champ.id], environments[champ.id], true); 
+
+    for(ReplayFrame &frame: championReplayFrames){
+        nlohmann::json frame_json = frame.to_json(); 
+        gen_json["champReplayFrames"].push_back(frame_json); 
+    }
+
     std::ofstream outFile("simulation_data/gen_"+std::to_string(genNum)+".json"); 
-    outFile << gen_json.dump(4); 
+    outFile << gen_json.dump(); 
     outFile.close(); 
     
 }
