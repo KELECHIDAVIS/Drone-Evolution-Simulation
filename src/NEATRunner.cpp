@@ -1,6 +1,32 @@
 #include "NEATRunner.hpp"
 #include <execution> // for parallelism
 
+void NEATRunner::clearDir(const std::filesystem::path& dir_path){
+    for (const auto& entry : std::filesystem::directory_iterator(dir_path)) 
+        std::filesystem::remove_all(entry.path());
+}
+void NEATRunner::saveConstants(const std::filesystem::path& dir_path){
+    nlohmann::json constants; 
+    constants["POP_SIZE"] = POP_SIZE; 
+    constants["ENV_WIDTH"] = ENV_WIDTH; 
+    constants["ENV_HEIGHT"] = ENV_HEIGHT; 
+    constants["SIM_LIFETIME"] = SIM_LIFETIME; 
+    constants["WEIGHT_MUTATION_RATE"] = WEIGHT_MUTATION_RATE; 
+    constants["WEIGHT_PERTURB_CHANCE"] = WEIGHT_PERTURB_CHANCE; 
+    constants["PERTURB_DELTA"] = PERTURB_DELTA; 
+    constants["WEIGHT_MIN"] = WEIGHT_MIN; 
+    constants["WEIGHT_MAX"] = WEIGHT_MAX; 
+    constants["ADD_NODE_RATE"] = ADD_NODE_RATE; 
+    constants["ADD_LINK_RATE"] = ADD_LINK_RATE; 
+    constants["C1"] = C1; 
+    constants["C2"] = C2; 
+    constants["C3"] = C3; 
+    constants["COMP_THRESHOLD"] = COMP_THRESHOLD; 
+
+    std::ofstream outFile("simulation_data/constants.json"); 
+    outFile << constants.dump(); 
+    outFile.close();
+}
 NEATRunner::NEATRunner()
 {
     for (int i =0; i< POP_SIZE; i++){
@@ -18,7 +44,14 @@ NEATRunner::NEATRunner()
 
 
     // Create data directory if it doesn't exist
-    std::filesystem::create_directories("simulation_data");
+    const std::filesystem::path dir = "simulation_data"; 
+
+    std::filesystem::create_directories(dir.string());
+
+    // delete all previous files   
+    clearDir(dir); 
+    // make sure constants are written into file as well
+    saveConstants(dir); 
     
 }
 

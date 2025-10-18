@@ -28,9 +28,9 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
-    static const int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static const int SIM_LIFETIME =1000; // how many frames each genome gets  
+    static constexpr int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
+    static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
+    static constexpr int SIM_LIFETIME =1000; // how many frames each genome gets  
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
     static constexpr double PERTURB_DELTA = 0.1;
@@ -59,13 +59,16 @@ public:
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
-    std::vector<Species> speciesList; 
-    
+    std::vector<Species> speciesList;
 
-    /* initialization: 
-        all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs 
-        (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
-    */
+    void clearDir(const std::filesystem::path &dir_path);
+
+    void saveConstants(const std::filesystem::path &dir_path);
+
+    /* initialization:
+            all networks started fully connected in target xy, rocket xy, rocket xy vel as inputs and rocket angle and thrust as outputs
+            (ALL VALUES WILL BE NORMALIZED: our activation function expects values from -1->1 )
+        */
     NEATRunner(); 
 
     Genome initGenome(); 
