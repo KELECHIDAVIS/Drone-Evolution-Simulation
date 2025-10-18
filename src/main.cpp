@@ -4,6 +4,9 @@
 int main() {
     
     NEATRunner runner; 
-    runner.runGeneration(); 
+    
+    for(int i =0; i<100; i++){
+        runner.runGeneration(); 
+    }
     return 0 ; 
 }

@@ -5,7 +5,6 @@ NEATRunner::NEATRunner()
 {
     for (int i =0; i< POP_SIZE; i++){
         Genome genome = initGenome(); 
-        genome.id = i ; 
         genomes.push_back(genome); 
 
         // init their neural networks
@@ -17,6 +16,9 @@ NEATRunner::NEATRunner()
         environments.push_back(env); 
     }
 
+
+    // Create data directory if it doesn't exist
+    std::filesystem::create_directories("simulation_data");
     
 }
 
@@ -174,8 +176,7 @@ void NEATRunner::testOutGenomes() {
 void NEATRunner::saveGenerationResults()
 {
     
-    // Create data directory if it doesn't exist
-    std::filesystem::create_directories("simulation_data");
+    
 
     
 
@@ -204,13 +205,19 @@ void NEATRunner::saveGenerationResults()
     
     // replay the champ
     // the best performer from the best species 
-    Genome &champ = bestPerformingSpecies->members.front(); 
+    Genome champ = bestPerformingSpecies->members.front();
+    Environment replayEnv(ENV_WIDTH, ENV_HEIGHT);
+    NeuralNetwork replayNet(champ, TANH);
 
-    std::vector<ReplayFrame> championReplayFrames= evaluateGenome(champ, networks[champ.id], environments[champ.id], true); 
+    std::vector<ReplayFrame> championReplayFrames = evaluateGenome(
+        champ, 
+        replayNet, 
+        replayEnv, 
+        true
+    ); 
 
-    for(ReplayFrame &frame: championReplayFrames){
-        nlohmann::json frame_json = frame.to_json(); 
-        gen_json["champReplayFrames"].push_back(frame_json); 
+    for (const ReplayFrame& frame : championReplayFrames) {
+        gen_json["champReplayFrames"].push_back(frame.to_json()); 
     }
 
     std::ofstream outFile("simulation_data/gen_"+std::to_string(genNum)+".json"); 
