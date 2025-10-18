@@ -2,6 +2,7 @@
 #include "NEATRunner.hpp"
 
 int main(){
-    std::cout<<"Forehead"<<std::endl; 
+    NEATRunner runner; 
+    runner.saveGenerationResults(); 
     return 0; 
 }

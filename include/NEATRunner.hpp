@@ -2,6 +2,10 @@
 #include "NeuralNetwork.hpp"
 #include "Environment.hpp"
 #include "helper.hpp"
+#include <string>
+#include <fstream>
+#include <filesystem>
+
 class NEATRunner{
 public:
     static const int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
@@ -22,6 +26,7 @@ public:
     int globalInnvNum=0;
     int genNum=0; 
     double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
+    double avgRawFit=0; 
     int gensSinceInnovation=0; 
     Species * bestPerformingSpecies = nullptr; 
     Species * worstPerformingSpecies = nullptr; 

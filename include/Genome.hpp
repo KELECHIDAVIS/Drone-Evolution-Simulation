@@ -1,5 +1,6 @@
 #pragma once
 #include <vector> 
+#include "json.hpp"
 // genomes include node genes and connection genes that later determine the phenotype of the agent (neural network)
 
 enum NodeType{
@@ -14,6 +15,14 @@ struct Node{ // at each node that isn't an input or bias, their will be an activ
     Node() : id(-1), type(NodeType::HIDDEN) {}
     Node(int i , NodeType t): 
     id(i), type(t){}
+
+    nlohmann::json to_json() const {
+        return nlohmann::json{
+            {"id", id},
+            {"type", static_cast<int>(type)}
+        };
+    }
+
 }; 
 
 //CONNECTIONS THAT ALR EXIST WITH A CERTAIN INNV NUM WILL HAVE THAT SAME INNOV NUM 
@@ -28,6 +37,17 @@ struct Connection{ // connects two nodes with a weight.
     Connection() : inId(-1), outId(-1), weight(0.0), isEnabled(true), innvNum(-1), isRecurrent(false) {}
     Connection(int in, int out, double w, bool en, int innov,bool rec)
         : inId(in), outId(out), weight(w), isEnabled(en),  innvNum(innov),isRecurrent(rec) {}
+
+    nlohmann::json to_json() const {
+        return nlohmann::json {
+            {"inId", inId},
+            {"outId", outId},
+            {"weight", weight},
+            {"isEnabled", isEnabled},
+            {"innvNum", innvNum},
+            {"isRecurrent", isRecurrent}
+        };
+    }
 }; 
 struct Genome{ // the blueprint to build the neural network 
     std::vector<Node> nodes;    
@@ -46,6 +66,25 @@ struct Genome{ // the blueprint to build the neural network
     // Add a connection with a new global innovation number
     void addConnection(int in, int out, double weight, bool enabled, int innovation, bool isRecurrent) {
         connections.emplace_back(in, out, weight, enabled, innovation, isRecurrent);
+    }
+
+    nlohmann::json to_json() const {
+        nlohmann::json nodes_json = nlohmann::json::array();
+        for (const auto& node : nodes) {
+            nodes_json.push_back(node.to_json());
+        }
+        
+        nlohmann::json conns_json = nlohmann::json::array();
+        for (const auto& conn : connections) {
+            conns_json.push_back(conn.to_json());
+        }
+        
+        return nlohmann::json{
+            {"fitness", fitness},
+            {"adjustedFitness", adjustedFitness},
+            {"nodes", nodes_json},
+            {"connections", conns_json}
+        };
     }
 }; 
 

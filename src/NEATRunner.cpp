@@ -50,10 +50,11 @@ void NEATRunner::createConnection(int in, int out, double weight, bool enabled, 
     int innvNum ; 
     if (innvTracker.find({in, out})!=innvTracker.end()){
         innvNum = innvTracker[{in, out}]; 
-    }else{
+    }else{ // innovation was found 
         innvTracker[{in, out}] = globalInnvNum; 
         innvNum = globalInnvNum; 
         globalInnvNum++;  
+        gensSinceInnovation=0; 
     }
     genome.addConnection(in, out, weight, enabled, innvNum,isRecurrent); 
 }
@@ -84,6 +85,8 @@ Genome NEATRunner::createGenome(int numInputs, int numBiases, int numOutputs, co
 
 void NEATRunner::runGeneration()
 {
+    gensSinceInnovation+=1 ; 
+
     testOutGenomes(); 
 
     speciate(); 
@@ -92,9 +95,10 @@ void NEATRunner::runGeneration()
 
     mutate(); 
 
-    saveGenerationResults(); 
+    saveGenerationResults();
 
     genNum++; 
+
 }
 
 // Single genome evaluation (non-parallel)
@@ -133,8 +137,36 @@ void NEATRunner::testOutGenomes() {
         });
 }
 
+
+
 void NEATRunner::saveGenerationResults()
 {
+    // Create data directory if it doesn't exist
+    std::filesystem::create_directories("data");
+
+    std::ofstream test_file("data/test.txt");
+    test_file << "Hello, this is a test\n";
+    test_file.close();
+    
+    nlohmann::json gen_json; 
+    gen_json["generation"] = genNum;
+    for (const auto& species : speciesList) {
+        nlohmann::json species_json;
+        species_json["id"] = species.id;
+        species_json["bestFitness"] = species.bestFitness;
+        for (const auto& genome : species.members) {
+            nlohmann::json genome_json= genome.to_json(); 
+        }
+        gen_json["species"].push_back(species_json);
+    }
+    gen_json["bestRawFit"] = bestRawGenome->fitness; 
+    gen_json["worstRawFit"] = worstRawGenome->fitness; 
+    gen_json["avgRawFit"] = avgRawFit; 
+
+    // std::ofstream outFile("gen_"+std::to_string(genNum)+".json"); 
+    // outFile << gen_json.dump(gen_json.size()); 
+    
+    
 }
 
 /*
@@ -417,9 +449,22 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 
     return C1*numExcess/N + C2*numDisjoint/N + C3*avgWeightDiff; 
 }
+
 void NEATRunner::keepTrackOfGenomeStats(Genome &genome){
-    
+    if(!bestAdjGenome || genome.adjustedFitness > bestAdjGenome->fitness){
+        bestAdjGenome = &genome; 
+    }    
+    if(!worstAdjGenome || genome.adjustedFitness < worstAdjGenome->fitness){
+        worstAdjGenome= &genome; 
+    }    
+    if(!bestRawGenome || genome.fitness > bestRawGenome->fitness){
+        bestRawGenome = &genome; 
+    }    
+    if(!worstRawGenome || genome.fitness < worstRawGenome->fitness){
+        worstRawGenome = &genome; 
+    }    
 }
+
 void NEATRunner::speciate()
 {
 
@@ -432,7 +477,7 @@ void NEATRunner::speciate()
         std::sort(genome.connections.begin(), genome.connections.end(), 
         [](const Connection& a, const Connection& b) { return a.innvNum < b.innvNum; });
 
-        //keep track of stats and connections 
+        //keep track 
         keepTrackOfGenomeStats(genome); 
 
         bool foundMatch = false; 
@@ -467,7 +512,7 @@ void NEATRunner::speciate()
     
     // sum total adj fit for all species within population
     totalAdjFit= 0; 
-
+    avgRawFit = 0; 
     // again for each species set their adjust fitness based on the size of their species 
     for (Species &species: speciesList){
         species.bestFitness = INT_MIN; 
@@ -476,6 +521,7 @@ void NEATRunner::speciate()
             genome.adjustedFitness = genome.fitness/species.members.size(); 
             species.bestFitness = std::max(genome.fitness, species.bestFitness) ; 
             species.sumOfAdjFits += genome.adjustedFitness; 
+            avgRawFit+=genome.fitness; 
         }
         
         totalAdjFit += species.sumOfAdjFits; 
@@ -483,8 +529,11 @@ void NEATRunner::speciate()
         if (!bestPerformingSpecies || species.sumOfAdjFits > bestPerformingSpecies->sumOfAdjFits)
             bestPerformingSpecies = &species;  
         
-
+        if (!worstPerformingSpecies || species.sumOfAdjFits < worstPerformingSpecies->sumOfAdjFits)
+            worstPerformingSpecies = &species;  
     }
+
+    avgRawFit/= POP_SIZE; 
 
     if (totalAdjFit <= 0.0) {
         std::cerr << "!! totalAdjFit was zero, setting totalAdjFit = 1 .\n";
