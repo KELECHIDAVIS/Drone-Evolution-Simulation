@@ -208,11 +208,6 @@ void NEATRunner::testOutGenomes() {
 
 void NEATRunner::saveGenerationResults()
 {
-    
-    
-
-    
-
     nlohmann::json gen_json; 
     gen_json["generation"] = genNum;
     for (const auto& species : speciesList) {
@@ -248,7 +243,7 @@ void NEATRunner::saveGenerationResults()
         replayEnv, 
         true
     ); 
-
+    
     for (const ReplayFrame& frame : championReplayFrames) {
         gen_json["champReplayFrames"].push_back(frame.to_json()); 
     }
@@ -408,8 +403,7 @@ void NEATRunner::crossover()
 
         spotsLeft -= numOffSpring; 
 
-        // TODO: will just sort for rn but could use adj fit as an average and if genome < speciesAdj it gets deleted  
-        // remove badly performing members from a species; greater fits are at front 
+        
         std::sort(species.members.begin(), species.members.end(), 
         [](const Genome& a, const Genome& b) { return a.fitness > b.fitness; });
 
