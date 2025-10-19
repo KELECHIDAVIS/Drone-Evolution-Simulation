@@ -10,6 +10,7 @@
 struct ReplayFrame{
     int frame; 
     int rocketRotation; 
+    float rocketThrust; 
     double rocketX; 
     double rocketY; 
     double targetX; 
@@ -19,6 +20,7 @@ struct ReplayFrame{
         return nlohmann::json{
             {"frame", frame},
             {"rotation", rocketRotation},
+            {"thrust",rocketThrust},
             {"rocketX", rocketX},
             {"rocketY", rocketY},
             {"targetX", targetX},
@@ -28,7 +30,7 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 1000; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static constexpr int SIM_LIFETIME =1000; // how many frames each genome gets  
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
@@ -36,8 +38,8 @@ public:
     static constexpr double PERTURB_DELTA = 0.1;
     static constexpr double WEIGHT_MIN = -1.0;
     static constexpr double WEIGHT_MAX = 1.0;
-    static constexpr double ADD_NODE_RATE = 0.03;
-    static constexpr double ADD_LINK_RATE = 0.05; // use 0.3 for very large pops
+    static constexpr double ADD_NODE_RATE = 0.05;
+    static constexpr double ADD_LINK_RATE = 0.3; // use 0.3 for very large pops
 
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
     C2=1.0f, // how much weight disjoint genes have  

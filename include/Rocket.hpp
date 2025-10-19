@@ -4,9 +4,9 @@
 #define M_PI 3.14159265358979323846
 class Rocket{
 public:         
-    const float mass = 1;  
-    const float base = 40; 
-    const float height = 70; 
+    static constexpr float MASS = 1;
+    static constexpr int BASE = 40;
+    static constexpr int HEIGHT= 70;
     int rotation=0; // 0-360 , start at 0
     float thrust=0.0f; // 0-1
     
@@ -47,7 +47,6 @@ public:
     
     // for triangle starting at 0 deg; CCW
     Eigen::Matrix<float, 2, 3> vLocal{
-        {height/2.0f, -height/2.0f, -height/2.0f},
-        {0, base/2.0f, -base/2.0f}
-    }; // local vertice calcs for triangle, private so don't recalc everytime 
+        {HEIGHT / 2.0f, -HEIGHT / 2.0f, -HEIGHT / 2.0f},
+        {0, BASE / 2.0f, -BASE / 2.0f}}; // local vertice calcs for triangle, private so don't recalc everytime
 };

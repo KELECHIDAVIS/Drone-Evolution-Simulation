@@ -21,8 +21,8 @@ void Rocket::update(float deltaTime)
     float angleRad = degToRad(rotation);
 
     // Thrust in direction of rocket
-    float a_thrust_x = (thrustForce * cos(angleRad)) / mass;
-    float a_thrust_y = (thrustForce * sin(angleRad) ) / mass;
+    float a_thrust_x = (thrustForce * cos(angleRad)) / MASS;
+    float a_thrust_y = (thrustForce * sin(angleRad) ) / MASS;
 
 
     // Total acceleration

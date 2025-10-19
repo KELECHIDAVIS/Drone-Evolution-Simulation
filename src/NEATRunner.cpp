@@ -23,6 +23,13 @@ void NEATRunner::saveConstants(const std::filesystem::path& dir_path){
     constants["C3"] = C3; 
     constants["COMP_THRESHOLD"] = COMP_THRESHOLD; 
 
+    constants ["TARGET_RADIUS"] = Target::RADIUS; 
+    constants["ROCKET_BASE"] = Rocket::BASE; 
+    constants["ROCKET_HEIGHT"] = Rocket::HEIGHT;
+    constants["ROCKET_MAX_THRUST"] = Rocket::MAX_THRUST;
+    constants["ROCKET_MAX_VEL"] = Rocket::MAX_VEL;
+    constants["ROCKET_GRAVITY"] = Rocket::GRAVITY;
+
     std::ofstream outFile("simulation_data/constants.json"); 
     outFile << constants.dump(); 
     outFile.close();
@@ -161,21 +168,13 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         env.rocket.setThrust(output(0));
         env.rocket.setRotation((int)(360 * output(1)));
 
-        int scoreBefore = env.score;
         alive = env.update(0.016f);
-        int scoreAfter = env.score;
-
-        if (scoreAfter > scoreBefore){
-            hitCount++;
-            totalFrames++;
-        }
 
     }
-    std::cout << "Eval: " << hitCount << " hits in " << totalFrames << " frames, score=" << env.score << "\n";
     return env.score; //TODO: CHANGE FITNESS FUNCTION;
 }
 std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
-    env.reset();  // Make sure you have this method!
+    env.reset();  
     net.reset();
     
     bool alive = true; 
@@ -187,13 +186,14 @@ std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwor
 
         if(replay){
             ReplayFrame frame = {
-                step, 
+                step,
                 env.rocket.getRotation(),
+                env.rocket.getThrust(),
                 env.rocket.pos(0),
                 env.rocket.pos(1),
                 env.target.pos(0),
                 env.target.pos(1),
-            }; 
+            };
             frames.push_back(frame); 
         }
         Eigen::VectorXd input(4);

@@ -4,21 +4,10 @@
 bool Environment::update(float deltaTime){
     rocket.update(deltaTime); 
 
-    
 
     if( checkCollision()){ 
         score++;
-        std::cout << "HIT! Rocket at (" << rocket.pos(0) << "," << rocket.pos(1)
-                  << "), Target at (" << target.pos(0) << "," << target.pos(1) << ")\n";
         target.respawn(windowWidth, windowHeight); 
-    }
-
-    const float GRACE = 10.0f; // Pixels outside bounds before terminating
-
-    if (rocket.pos(0) < -GRACE || rocket.pos(0) > windowWidth + GRACE ||
-        rocket.pos(1) < -GRACE || rocket.pos(1) > windowHeight + GRACE)
-    {
-        return false;
     }
 
     // if rocket outside of bounds it's not alive
@@ -50,14 +39,13 @@ bool Environment::checkCollision()
     float dx = target.pos(0) - rocket.pos(0); 
     float dy = target.pos(1) - rocket.pos(1);
     
-    float dist = sqrt(dx*dx +dy*dy); 
+    float dist = sqrt(dx*dx +dy*dy);
 
     float rocketRadius = std::sqrt(
-        (rocket.base / 2.f) * (rocket.base / 2.f) +
-        (rocket.height / 2.f) * (rocket.height / 2.f)
-    );
+        (Rocket::BASE / 2.f) * (Rocket::BASE / 2.f) +
+        (Rocket::HEIGHT / 2.f) * (Rocket::HEIGHT / 2.f));
 
-    if (dist > target.radius + rocketRadius)
+    if (dist > Target::RADIUS + rocketRadius)
         return false; // No way they're touching
     
 
@@ -124,8 +112,8 @@ bool Environment::separateAxis(){
 
         // Project target center
         float targetProj = projectScalar(n, target.pos);
-        float circleMax = targetProj + target.radius;
-        float circleMin = targetProj - target.radius;
+        float circleMax = targetProj + Target::RADIUS;
+        float circleMin = targetProj - Target::RADIUS;
 
         if (max < circleMin || min > circleMax)
         {

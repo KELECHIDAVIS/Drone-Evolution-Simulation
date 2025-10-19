@@ -57,3 +57,11 @@ ctest --verbose -C Debug
 cd build-release
 cmake --build . --config Release
 ctest --verbose -C Release
+
+# Build WITHOUT SFML (faster, default)
+cmake -B build
+cmake --build build
+
+# Build WITH SFML visualization
+cmake -B build -DENABLE_SFML=ON
+cmake --build build
