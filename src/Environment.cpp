@@ -1,13 +1,34 @@
 #include "Environment.hpp"
-
+#include <iostream> 
 // updates the rocket and checks if it collided with the target
-void Environment::update(float deltaTime){
+bool Environment::update(float deltaTime){
     rocket.update(deltaTime); 
 
+    
+
     if( checkCollision()){ 
-        score++; 
+        score++;
+        std::cout << "HIT! Rocket at (" << rocket.pos(0) << "," << rocket.pos(1)
+                  << "), Target at (" << target.pos(0) << "," << target.pos(1) << ")\n";
         target.respawn(windowWidth, windowHeight); 
     }
+
+    const float GRACE = 10.0f; // Pixels outside bounds before terminating
+
+    if (rocket.pos(0) < -GRACE || rocket.pos(0) > windowWidth + GRACE ||
+        rocket.pos(1) < -GRACE || rocket.pos(1) > windowHeight + GRACE)
+    {
+        return false;
+    }
+
+    // if rocket outside of bounds it's not alive
+    if (rocket.pos(0) < 0 || rocket.pos(0) > windowWidth ||
+        rocket.pos(1) < 0 || rocket.pos(1) > windowHeight)
+    {
+        return false; // Freeze
+    }
+
+    return true; 
 }
 void Environment::reset() {
     rocket.setThrust(0); 
@@ -15,7 +36,8 @@ void Environment::reset() {
     rocket.pos=Eigen::Vector2f(windowWidth/2.0, windowHeight/2.0); 
     rocket.vel=Eigen::Vector2f(0, 0); 
     
-    target.respawn(windowWidth/2.0, windowHeight/2.0); 
+    
+    target.respawn(windowWidth, windowHeight); 
     score = 0;
 }
 //CAN FURTHER OPTIMIZE THIS 
@@ -61,6 +83,12 @@ Eigen::Matrix<float, 2, 3> Environment::getRocketVertices()
     return rocket.getVertices();
 }
 
+float projectScalar(Eigen::Vector2f n, Eigen::Vector2f a)
+{
+    float dotProduct = a.dot(n);
+    float denom = n.dot(n);
+    return dotProduct / denom; // Returns a scalar, not a vector
+}
 bool Environment::separateAxis(){
     // get normals from triangle
     // vertices are ccw
@@ -84,37 +112,27 @@ bool Environment::separateAxis(){
 
     // for each axis, project and check if they are gaps 
     for (Eigen::Vector2f n : axes){
-        // project each vertice on the line 
-        // then get the max and min mag on that line 
-        float max= INT_MIN , min = INT_MAX; 
-        for (int i =0 ; i< 3; i++ ){
-            Eigen::Vector2f proj = projection(n, vertices.col(i)); // MIGHT HAVE TO NORMALIZE IF DOESN'T WORK 
-            float norm = proj.norm(); 
-            max= std::max(max,norm); 
-            min= std::min(min,norm); 
+        float max = -std::numeric_limits<float>::infinity();
+        float min = std::numeric_limits<float>::infinity();
+
+        for (int i = 0; i < 3; i++)
+        {
+            float proj = projectScalar(n, vertices.col(i));
+            max = std::max(max, proj);
+            min = std::min(min, proj);
         }
-        
-        // find circle's  
-        Eigen::Vector2f proj = projection(n, target.pos); 
-        float norm = proj.norm(); 
-        // subtract and add radius for it's max and min 
-        float circleMax = target.radius +norm; 
-        float circleMin = -target.radius + norm ; 
-    
-        // check for collision on this axis 
-        if(max < circleMin){
-            return false; // gap
-        }else if (min > circleMax){
-            return false; 
-        }// else they are touching on this axis 
+
+        // Project target center
+        float targetProj = projectScalar(n, target.pos);
+        float circleMax = targetProj + target.radius;
+        float circleMin = targetProj - target.radius;
+
+        if (max < circleMin || min > circleMax)
+        {
+            return false; // Gap found, no collision
+        }
     }
 
     return true; 
 }
-// return the projection of a onto n 
-Eigen::Vector2f Environment::projection(Eigen::Vector2f n, Eigen::Vector2f a)
-{
-    float dotProduct= a.dot(n); 
-    float denom = n.dot(n); 
-    return (dotProduct/denom) * n ;
-}
+

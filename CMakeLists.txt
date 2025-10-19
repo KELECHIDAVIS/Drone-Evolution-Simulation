@@ -20,14 +20,14 @@ find_package(Eigen3 3.4 QUIET NO_MODULE)
 
 if (NOT Eigen3_FOUND)
   message(STATUS "Eigen3 not found on the system — fetching via FetchContent")
+  set(BUILD_TESTING OFF CACHE BOOL "Build tests" FORCE)
   FetchContent_Declare(
     eigen
     GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-    GIT_TAG 3.4.0    # or change to the specific tag you want
+    GIT_TAG 3.4.0
     GIT_SHALLOW ON
   )
   FetchContent_MakeAvailable(eigen)
-  # After adding Eigen via FetchContent, the target is Eigen3::Eigen as well.
 endif()
 
 # Grab all source files in src/
@@ -63,5 +63,5 @@ foreach(test_source ${TEST_SOURCES})
     get_filename_component(test_name ${test_source} NAME_WE)
     add_executable(${test_name} ${test_source})
     target_link_libraries(${test_name} PRIVATE DroneEvoLib)
-    add_test(NAME ${test_name} COMMAND ${test_name})
+    add_test(NAME ${test_name} COMMAND ${test_name} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endforeach()

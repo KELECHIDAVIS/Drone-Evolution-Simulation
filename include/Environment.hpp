@@ -15,7 +15,7 @@ public:
     : windowWidth(width), windowHeight(height), target(width, height), rocket(width/2.0,height/2.0) {}
 
 
-    void update(float deltaTime); 
+    bool update(float deltaTime); //returns if rocket is alive 
     bool separateAxis(); 
     Eigen::Vector2f projection(Eigen::Vector2f n, Eigen::Vector2f a ); 
     bool checkCollision(); 

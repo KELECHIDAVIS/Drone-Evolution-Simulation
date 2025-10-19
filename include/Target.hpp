@@ -15,7 +15,11 @@ public:
     }
 
     void respawn( int width, int height) {
-        pos = {getRandNum(0,width),getRandNum(0,height) };
+
+        // shouldn't be on the border 
+        float randWidth = getRandNum(width*.1 , width*.9);
+        float randHeight = getRandNum(height * .1, height * .9);
+        pos = {randWidth,randHeight };
     }
 
 }; 

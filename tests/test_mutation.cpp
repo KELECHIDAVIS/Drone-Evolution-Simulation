@@ -168,10 +168,12 @@ void testAddNodeMutation() {
     // New connections should have weight ~1.0 and weight from old conn
     std::cout << "  All connections valid:\n";
     for (const auto& conn : genome.connections) {
+        std::cout << "    " << conn.inId << " -> " << conn.outId
+                  << " (enabled: " << conn.isEnabled << ", weight: " << conn.weight << ")\n";
+        std::cout<<"Connection weight: "<< conn.weight<<"\n"; 
         assert(conn.weight >= NEATRunner::WEIGHT_MIN);
         assert(conn.weight <= NEATRunner::WEIGHT_MAX);
-        std::cout << "    " << conn.inId << " -> " << conn.outId 
-                  << " (enabled: " << conn.isEnabled << ", weight: " << conn.weight << ")\n";
+        
     }
     
     std::cout << "  ✓ Add Node Mutation test passed\n";

@@ -141,8 +141,16 @@ void NEATRunner::runGeneration()
 double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env) {
     env.reset();  // Make sure you have this method!
     net.reset();
-    
+
+    int hitCount = 0;
+    int totalFrames = 0;
+
+    bool alive= true; 
     for (int step = 0; step < SIM_LIFETIME; step++) {
+
+        if(!alive) 
+            break; 
+
         Eigen::VectorXd input(4);
         input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
         input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
@@ -152,18 +160,31 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         Eigen::VectorXd output = net.feedForward(input);
         env.rocket.setThrust(output(0));
         env.rocket.setRotation((int)(360 * output(1)));
-        env.update(0.016f);
+
+        int scoreBefore = env.score;
+        alive = env.update(0.016f);
+        int scoreAfter = env.score;
+
+        if (scoreAfter > scoreBefore){
+            hitCount++;
+            totalFrames++;
+        }
+
     }
-    
-    return env.score; //TODO: CHANGE FITNESS FUNCTION; MAKE IT SO GENOMES CAN DIE EARLIER
+    std::cout << "Eval: " << hitCount << " hits in " << totalFrames << " frames, score=" << env.score << "\n";
+    return env.score; //TODO: CHANGE FITNESS FUNCTION;
 }
 std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
     env.reset();  // Make sure you have this method!
     net.reset();
     
+    bool alive = true; 
     std::vector<ReplayFrame> frames; 
 
     for (int step = 0; step < SIM_LIFETIME; step++) {
+        if(!alive)
+            break; 
+
         if(replay){
             ReplayFrame frame = {
                 step, 
@@ -184,7 +205,7 @@ std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwor
         Eigen::VectorXd output = net.feedForward(input);
         env.rocket.setThrust(output(0));
         env.rocket.setRotation((int)(360 * output(1)));
-        env.update(0.016f);
+        alive = env.update(0.016f);
     }
     return frames; 
 }
@@ -690,14 +711,22 @@ void NEATRunner::addNodeMutation(Genome &genome){
     std::shuffle(indices.begin(), indices.end(), getRNG());
     
     for(int indx : indices){
-        Connection &conn = genome.connections[indx]; 
+        Connection conn = genome.connections[indx]; 
 
         if(!conn.isEnabled) continue; 
 
         genome.addNode(NodeType::HIDDEN); 
-        Node &newNode = genome.nodes.back(); 
+        Node &newNode = genome.nodes.back();
 
-        conn.isEnabled =false; 
+        // Find and disable the original connection (it might have moved due to reallocation)
+        for (auto &c : genome.connections)
+        {
+            if (c.inId == conn.inId && c.outId == conn.outId && c.innvNum == conn.innvNum)
+            {
+                c.isEnabled = false;
+                break;
+            }
+        }
 
         createConnection(conn.inId, newNode.id, 1.0, true, conn.isRecurrent, genome); 
         createConnection(newNode.id, conn.outId, conn.weight, true, conn.isRecurrent, genome); 

@@ -3,7 +3,7 @@
 cd build
 cmake .. --preset debug
 cmake --build . --config Debug
-.\bin\DroneEvo.exe
+.\bin\Debug\DroneEvo.exe
 
 
 // release build 
@@ -11,7 +11,7 @@ cmake --build . --config Debug
 cd build-release
 cmake .. --preset release
 cmake --build . --config Release
-.\bin\DroneEvo.exe
+.\bin\Release\DroneEvo.exe
 
 
 // if folders alr exist: 
@@ -20,29 +20,40 @@ cmake --build . --config Release
 
 cd build
 cmake --build . --config Debug
-.\bin\DroneEvo.exe
+.\bin\Debug\DroneEvo.exe
 
 // release
 
 cd build-release
 cmake --build . --config Release
-.\bin\DroneEvo.exe
+.\bin\Release\DroneEvo.exe
 
 
 //clean and build from scratch 
 
 // debug
-rmdir -r build
+Remove-Item -Recurse -Force build
 mkdir build
 cd build
 cmake .. --preset debug
 cmake --build . --config Debug
-.\bin\DroneEvo.exe
+.\bin\Debug\DroneEvo.exe
 
 //release
-rm -r build-release
+Remove-Item -Recurse -Force build-release
 mkdir build-release
 cd build-release
 cmake .. --preset release
 cmake --build . --config Release
-.\bin\DroneEvo.exe
+.\bin\Release\DroneEvo.exe
+
+
+// run test 
+
+cd build
+cmake --build . --config Debug
+ctest --verbose -C Debug
+
+cd build-release
+cmake --build . --config Release
+ctest --verbose -C Release
