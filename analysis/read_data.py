@@ -15,16 +15,11 @@ def getConstantData(filePath):
         return None
     
 
-def getGenerationsData(dirPath):
-    entries = os.listdir(dirPath)
-
-    genData = []
-    for entry in entries:
-        
-        filePath = os.path.join(dirPath, entry)
-
-        if filePath.startswith("constant"): continue 
-        
-        if os.path.isfile(filePath):
-            genData.append(getConstantData(filePath))
+def getGenerationData(dirPath, genNumber):
+    """
+    Lazily load a single generation file by generation number.
+    Useful for on-demand loading when working with thousands of files.
+    """
+    filePath = os.path.join(dirPath, f"gen_{genNumber}.json")
+    return getConstantData(filePath)
 
