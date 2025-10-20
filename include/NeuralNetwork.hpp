@@ -121,8 +121,8 @@ public:
                 }
             }
 
-            // apply activation and set value of node 
-            sum = activate(sum); 
+            //TODO: experiment to find the best activation 
+            sum = activate(sum);  
             values[nodeID] =sum ; 
         }
 

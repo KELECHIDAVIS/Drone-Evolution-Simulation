@@ -409,6 +409,8 @@ Species& NEATRunner::selectRandomSpecies(){
     int indx = std::floor(getRandNum(0, speciesList.size())); 
     return speciesList[indx]; 
 }
+
+//TODO: stagnant species should not be allowed to reproduce ; if best fitness of a species hasn't gone up in 15 gens don't allow it to reproduce  
 void NEATRunner::crossover()
 {
     std::vector<Genome> nextGen; 
