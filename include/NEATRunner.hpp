@@ -15,9 +15,12 @@ struct ReplayFrame{
     double rocketY; 
     double targetX; 
     double  targetY; 
+    std::pair<float,float> vertex1;
+    std::pair<float,float> vertex2;
+    std::pair<float, float> vertex3;
 
     nlohmann::json to_json() const {
-        return nlohmann::json{
+        nlohmann::json frame_json{
             {"frame", frame},
             {"rotation", rocketRotation},
             {"thrust",rocketThrust},
@@ -25,7 +28,16 @@ struct ReplayFrame{
             {"rocketY", rocketY},
             {"targetX", targetX},
             {"targetY", targetY},
+            {"v1x", vertex1.first},
+            {"v1y", vertex1.second},
+            {"v2x", vertex2.first},
+            {"v2y", vertex2.second},
+            {"v3x", vertex3.first},
+            {"v3y", vertex3.second}
         };
+
+        
+        return frame_json;
     }
 }; 
 class NEATRunner{

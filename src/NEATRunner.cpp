@@ -185,6 +185,7 @@ std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwor
             break; 
 
         if(replay){
+            Eigen::Matrix<float, 2, 3>  verts = env.getRocketVertices();
             ReplayFrame frame = {
                 step,
                 env.rocket.getRotation(),
@@ -193,6 +194,9 @@ std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwor
                 env.rocket.pos(1),
                 env.target.pos(0),
                 env.target.pos(1),
+                {verts(0, 0), verts(1 , 0)},
+                {verts(0, 1), verts(1, 1)},
+                {verts(0,2), verts(1, 2)},
             };
             frames.push_back(frame); 
         }
@@ -409,6 +413,7 @@ Species& NEATRunner::selectRandomSpecies(){
     int indx = std::floor(getRandNum(0, speciesList.size())); 
     return speciesList[indx]; 
 }
+
 
 //TODO: stagnant species should not be allowed to reproduce ; if best fitness of a species hasn't gone up in 15 gens don't allow it to reproduce  
 void NEATRunner::crossover()

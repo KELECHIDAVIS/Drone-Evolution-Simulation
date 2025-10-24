@@ -7,10 +7,10 @@ int main() {
 
     #ifdef NDEBUG
         // Release build
-        int generations = 2000; // release can handles much more generations much faster (1000+)
+        int generations = 500; // release can handles much more generations much faster (1000+)
     #else
         // Debug build
-        int generations = 100;
+        int generations = 10;
     #endif
 
     for(int i =0; i<generations; i++){

@@ -5,8 +5,8 @@
 class Rocket{
 public:         
     static constexpr float MASS = 1;
-    static constexpr int BASE = 40;
-    static constexpr int HEIGHT= 70;
+    static constexpr int BASE = 15;
+    static constexpr int HEIGHT= 30;
     int rotation=0; // 0-360 , start at 0
     float thrust=0.0f; // 0-1
     
