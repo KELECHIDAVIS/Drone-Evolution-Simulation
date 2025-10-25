@@ -33,9 +33,14 @@ current_gen =0
 GEN_STEP =20
 genData = getGenerationData(dir_path, current_gen)
 
-def getRocketVertices(x, y, rot, base, height):
-    pass 
+def getRocketVertices(data, frame):
+    vertices = [
+        (data['champReplayFrames'][frame]['v1x'],data['champReplayFrames'][frame]['v1y']),
+        (data['champReplayFrames'][frame]['v2x'],data['champReplayFrames'][frame]['v2y']),
+        (data['champReplayFrames'][frame]['v3x'],data['champReplayFrames'][frame]['v3y']),
+    ] 
 
+    return vertices 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -54,8 +59,9 @@ while running:
     target_x = round(genData["champReplayFrames"][current_frame]['targetX'])
     target_y = round(genData["champReplayFrames"][current_frame]['targetY'])
 
-    # vertices = getRocketVertices (rocket_x, rocket_y, rocket_rot, constants['ROCKET_BASE'], constants['ROCKET_HEIGHT'])
-
+    vertices= getRocketVertices(genData, current_frame); 
+    print(vertices)
+    time.sleep(10000)
     current_frame+=1 
     
     screen.fill("black")
@@ -63,7 +69,7 @@ while running:
     pygame.draw.rect(screen, (255,255,255) ,(0,0, constants['ENV_WIDTH'], constants['ENV_HEIGHT'] ), 1 )
     
     pygame.draw.circle(screen, (255, 0,0), (target_x ,target_y), constants['TARGET_RADIUS'] )
-    pygame.draw.circle(screen, (0, 255,0), (rocket_x ,rocket_y), constants['ROCKET_BASE'] )
+    pygame.draw.polygon(screen, (0, 255,0), vertices, 0)
 
     
     pygame.display.update()
