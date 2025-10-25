@@ -44,7 +44,7 @@ class NEATRunner{
 public:
     static constexpr int POP_SIZE = 1000; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static constexpr int SIM_LIFETIME =1000; // how many frames each genome gets  
+    static constexpr int SIM_LIFETIME =1250; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;

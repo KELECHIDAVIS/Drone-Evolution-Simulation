@@ -7,7 +7,7 @@ class Target{
 public:
 
     Eigen::Vector2f pos; 
-    static constexpr float RADIUS=30; 
+    static constexpr float RADIUS=12; 
 
     // targets are seeded with score so that they have the same random position based on score
     Target( int windowWidth , int windowHeight){
