@@ -8,7 +8,6 @@ import pygame
 import os
 from read_data import getConstantData, getGenerationData
 import time 
-
 releaseMode = True 
 print("Starting Sim Analysis in "+ ("Release" if releaseMode else "Debug"))
 dir_path = "../build-release/simulation_data" if releaseMode else "../build/simulation_data"
