@@ -72,8 +72,8 @@ best_fit_history = []
 
 #species graph data 
 species_categories = [] # what species ith member belongs to 
-member_num_conn = []   #how much conns they have 
-member_num_nodes = []   # how many nodes 
+member_num_conn = [] #how much conns they have 
+member_num_nodes = []# how many nodes 
 
 #Init information for connectivity graph 
 def get_species_connectivity(genData): 
@@ -154,31 +154,101 @@ def render_fit_graphs_to_surface(width, height):
     plt.close(fig)
     return surface
 
+# 🔹 Toggle whether to display the legend
+show_species_legend = True
+
+# 🔹 Choose a Matplotlib color map (you can change this to 'plasma', 'viridis', etc.)
+species_cmap = plt.get_cmap('tab10')  # Up to 10 distinct species nicely
+
 def render_species_graph_to_surf(width, height):
-    """Render matplotlib plots (avg & best fitness) into a Pygame surface."""
+    """
+    Renders the Species Connectivity Graph with:
+     Custom color map per species
+     Optional legend toggle
+     Optional markers & centroids per species
+    """
     if len(species_categories) == 0:
         return None
 
     dpi = 100
     fig = plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     canvas = FigureCanvas(fig)
+    ax = fig.add_subplot(111)
 
-    # Plot correct data
-    plt.scatter(gen_history, avg_fit_history, label="Avg Raw Fit")
-    plt.xlabel("Nodes")
-    plt.ylabel("Connections")
-    plt.title("Population \"Connectivity\"")
-    plt.legend()
-    plt.tight_layout()
+    # Data arrays
+    nodes = np.array(member_num_nodes)
+    conns = np.array(member_num_conn)
+    categories = np.array(species_categories)
+    unique_species = np.unique(categories)
 
-    # Render and convert to RGBA
+    # Marker shapes (repeats if more species than markers)
+    markers = ['o', 's', '^', 'D', 'P', 'X', '*', 'v', '<', '>']
+
+    # Loop species and plot separately
+    for i, species_id in enumerate(unique_species):
+        mask = (categories == species_id)
+        marker = markers[i % len(markers)]
+
+        # 🎨 Assign color based on colormap
+        color = species_cmap(i / max(len(unique_species), 1))
+
+        # Plot individuals
+        ax.scatter(
+            nodes[mask],
+            conns[mask],
+            label=f"Species {species_id}",
+            marker=marker,
+            s=30,
+            alpha=0.75,
+            color=color
+        )
+
+        # ✅ Compute centroid for this species
+        centroid_x = np.mean(nodes[mask])
+        centroid_y = np.mean(conns[mask])
+
+        # Plot centroid using big X marker
+        ax.scatter(
+            centroid_x,
+            centroid_y,
+            marker='X',
+            s=120,
+            edgecolor='black',
+            linewidths=1.2,
+            color=color
+        )
+
+        # Add label on centroid
+        ax.text(
+            centroid_x,
+            centroid_y,
+            f"{species_id}",
+            fontsize=8,
+            ha='center',
+            va='center',
+            color='black',
+            fontweight='bold'
+        )
+
+    # Graph labels
+    ax.set_xlabel("Nodes")
+    ax.set_ylabel("Connections")
+    ax.set_title("Population Connectivity by Species")
+
+    # ✅ Toggle legend display
+    if show_species_legend:
+        ax.legend(fontsize='small', markerscale=1, loc='best')
+
+    ax.grid(True, linestyle='--', alpha=0.3)
+    fig.tight_layout()
+
+    # Convert to Pygame Surface
     canvas.draw()
-    raw_data = canvas.buffer_rgba()  
-
-    # Convert to Pygame surface (RGBA)
-    surface = pygame.image.frombuffer(raw_data, (width, height), "RGBA")
+    raw_data = canvas.buffer_rgba()
+    surf = pygame.image.frombuffer(raw_data, (width, height), "RGBA")
     plt.close(fig)
-    return surface
+
+    return surf
 
 def get_rocket_vertices(data, frame_index):
     """Return vertices in Pygame coordinates (flip y-axis)."""
@@ -257,7 +327,9 @@ frame_delay = 60  # fps cap
 
 # Mark we've already added the first generation to history
 last_graph_gen = genData.get('generation', None)
-
+fps_font = pygame.font.SysFont("consolas", 18)
+graph_surface = render_fit_graphs_to_surface(graphs_w, graphs_h)
+graph_species = render_species_graph_to_surf(graphs_w, graphs_h)    
 # Main loop
 while running:
     for event in pygame.event.get():
@@ -269,7 +341,10 @@ while running:
                 running = False
             elif event.key == pygame.K_SPACE:
                 paused = not paused
+            elif event.key == pygame.K_l:   # Press 'L' to toggle legend
+                show_species_legend = not show_species_legend
 
+    
     if not paused:
         # advance frames; if we exhausted frames for this generation, load next gen
         if current_frame >= len(genData.get("champReplayFrames", [])):
@@ -287,6 +362,8 @@ while running:
             if UPDATE_GRAPH_ON_GEN:
                 update_graph_history_with_gen(genData)
                 last_graph_gen = genData.get('generation', last_graph_gen)
+                graph_surface = render_fit_graphs_to_surface(graphs_w, graphs_h)
+                graph_species = render_species_graph_to_surf(graphs_w, graphs_h)    
         else:
             current_frame += 1
 
@@ -297,9 +374,22 @@ while running:
     draw_stats_panel(screen, genData)
 
     # render graphs (only update figure when gen history changed - we keep this cheap)
-    graph_surface = render_fit_graphs_to_surface(graphs_w, graphs_h)
-    screen.blit(graph_surface, (graphs_x, graphs_y))
+    if graph_surface:
+        screen.blit(graph_surface, (graphs_x, graphs_y))
+    if graph_species:
+        screen.blit(graph_species, (graphs_x, env_h))
 
+    fps = clock.get_fps()
+    if fps >= 60:
+        fps_color = (0, 255, 0)  # Green
+    elif fps >= 30:
+        fps_color = (255, 255, 0)  # Yellow
+    else:
+        fps_color = (255, 0, 0)  # Red
+
+    fps_text = font.render(f"FPS: {fps:.2f}", True, fps_color)
+    screen.blit(fps_text, (10, 10))
+    
     pygame.display.flip()
     clock.tick(frame_delay)
 
