@@ -42,20 +42,21 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 1000; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 300; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static constexpr int SIM_LIFETIME =750; // how many frames each genome gets  
+    static constexpr int SIM_LIFETIME =1500; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
+    static constexpr float INIT_CONNECTIVITY_RATE= .85; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
     static constexpr double PERTURB_DELTA = 0.1;
     static constexpr double WEIGHT_MIN = -1.0;
     static constexpr double WEIGHT_MAX = 1.0;
     static constexpr double ADD_NODE_RATE = .03f; //0.03;
-    static constexpr double ADD_LINK_RATE = 0.15f; // .05 // use 0.3 for very large pops
+    static constexpr double ADD_LINK_RATE = 0.05f; // .05 // use 0.3 for very large pops
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
     C2=1.0f, // how much weight disjoint genes have  
-    C3= 3.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
+    C3= .4f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=4.0f; // should change for larger pops  
     int globalInnvNum=0;
     int genNum=0; 
@@ -64,6 +65,7 @@ public:
     int gensSinceInnovation=0; 
     Species * bestPerformingSpecies = nullptr; // based off sum of adjusted fitness 
     Species * worstPerformingSpecies = nullptr; 
+    Genome bestPerformingGenome;
     double bestAdjFit ; // raw_fit/species_size; helps innovative genomes from worse species be more competitive 
     double  bestRawFit; 
     double  worstRawFit; 

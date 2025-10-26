@@ -15,7 +15,7 @@ from read_data import getConstantData, getGenerationData
 import graphviz 
 # ---------- User options ----------
 releaseMode = True
-GEN_STEP = 1000             
+GEN_STEP = 50             
 UPDATE_GRAPH_ON_GEN = True  # we update graphs only when generation changes
 # ----------------------------------
 
@@ -166,7 +166,6 @@ def render_species_graph_to_surf(width, height):
     Renders the Species Connectivity Graph with:
      Custom color map per species
      Optional legend toggle
-     Optional markers & centroids per species
     """
     if len(species_categories) == 0:
         return None
@@ -204,7 +203,7 @@ def render_species_graph_to_surf(width, height):
             color=color
         )
 
-        # ✅ Compute centroid for this species
+        #  Compute centroid for this species
         centroid_x = np.mean(nodes[mask])
         centroid_y = np.mean(conns[mask])
 
@@ -236,7 +235,7 @@ def render_species_graph_to_surf(width, height):
     ax.set_ylabel("Connections")
     ax.set_title("Population Connectivity by Species")
 
-    # ✅ Toggle legend display
+    # Toggle legend display
     if show_species_legend:
         ax.legend(fontsize='small', markerscale=1, loc='best')
 
@@ -257,8 +256,8 @@ def render_champ_neural_network(width ,height , filename='champion_nn'):
     dot.attr(rankdir='LR')  # Left-to-right layout
     dot.attr(bgcolor='black')  
     #dot = dot.unflatten(stagger = 3)
-    bestSpecies = genData.get('bestSpecies', 0) 
-    genome  = genData.get('species',[])[bestSpecies].get('members', [])[0]
+    champSpecies = genData.get('champSpecies', 0) 
+    genome  = genData.get('species',[])[champSpecies].get('members', [])[0]
     
     # Add nodes
     for node in genome["nodes"]:
@@ -282,13 +281,14 @@ def render_champ_neural_network(width ,height , filename='champion_nn'):
         w = conn["weight"]
 
         color = "green" if w > 0 else "red"
-        width = str(min(max(abs(w) * 2, 0.2), 3))  # thicker lines = stronger connections
+        width = str(min(max(abs(w) * 2, 1), 3))  # thicker lines = stronger connections
 
         dot.edge(in_node, out_node, label=f"{w:.2f}", color=color, penwidth=width)
 
     # Save & render
-    u = dot.unflatten(stagger=2)
+    u = dot.unflatten(stagger=3)
     u.render(filename, cleanup=True)
+    #dot.render(filename, cleanup=True)
     
     nn_image = pygame.image.load(filename+".png")
     nn_image = pygame.transform.smoothscale(nn_image, (env_w*2, env_h))

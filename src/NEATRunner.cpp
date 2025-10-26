@@ -77,7 +77,8 @@ Genome NEATRunner::initGenome() // at the start of the sim
     // 50% chance per connection
     for (int in = 0; in <= 4; ++in) {
         for (int out = 5; out <= 6; ++out) {
-            if (getRandNum(0, 1) < 0.5) {
+            if (getRandNum(0, 1) < INIT_CONNECTIVITY_RATE)
+            {
                 createConnection(in, out, getRandNum(WEIGHT_MIN, WEIGHT_MAX), true, false, genome);
             }
         }
@@ -146,38 +147,61 @@ void NEATRunner::runGeneration()
 
 // Single genome evaluation (non-parallel)
 double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env) {
-    env.reset();  // Make sure you have this method!
+    env.reset();
     net.reset();
 
-    bool alive= true; 
-    double fit = 0; 
-    for (int step = 0; step < SIM_LIFETIME; step++) {
+    bool alive = true;
+    int numHits = 0;
+    double totalTimeToHit = 0;
+    double closestDistance = std::numeric_limits<double>::infinity();
 
-        if(!alive) 
-            break; 
+    for (int step = 0; step < SIM_LIFETIME; step++)
+    {
+        if (!alive)
+            break;
 
         Eigen::VectorXd input(4);
         input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
         input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
         input(2) = env.rocket.vel(0) / Rocket::MAX_VEL;
         input(3) = env.rocket.vel(1) / Rocket::MAX_VEL;
-        
+
         Eigen::VectorXd output = net.feedForward(input);
         env.rocket.setThrust(output(0));
         env.rocket.setRotation((int)(360 * output(1)));
 
-        // calculate fit 
-        double dist = env.distFromTarget() ; 
-        if (!approxEqual(0.0, dist, 1e-6)){ // if it is 0 it's alr account for 
-            fit+= 1/(dist*dist) ;  // squared distance 
-        }
+        double dist = env.distFromTarget();
+        closestDistance = std::min(closestDistance, dist);
 
+        // Check if target was just hit
+        int previousHits = env.score;
         alive = env.update(0.016f);
 
+        if (env.score > previousHits)
+        {
+            numHits++;
+            totalTimeToHit += step; // Time penalty for slow hits
+        }
     }
-    fit = .9*env.score + fit/SIM_LIFETIME ; 
 
-    return fit; //TODO: MAKE SURE SCORE IS ACCURATEly getting updated when target is eaten  
+    double fitness = 0.0;
+
+    // Primary objective: number of hits (heavily weighted)
+    fitness += numHits * 1000.0;
+
+    // Secondary: efficiency (fewer steps to get hits)
+    if (numHits > 0)
+    {
+        double avgTimePerHit = totalTimeToHit / numHits;
+        double timeEfficiency = 1.0 - (avgTimePerHit / SIM_LIFETIME);
+        fitness += numHits * timeEfficiency * 500.0;
+    }
+
+    // Tertiary: encourage approaching targets even without hits
+    double distanceReward = (1.0 - (closestDistance / std::max(ENV_WIDTH, ENV_HEIGHT))) * 50.0;
+    fitness += distanceReward;
+
+    return std::max(0.0, fitness); // Ensure non-negative //TODO: MAKE SURE SCORE IS ACCURATEly getting updated when target is eaten
 }
 std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
     env.reset();  
@@ -259,12 +283,12 @@ void NEATRunner::saveGenerationResults()
 
     gen_json["bestSpecies"] = bestPerformingSpecies->id; 
     gen_json["worstSpecies"] = worstPerformingSpecies->id; 
-    
     gen_json["gensSinceInnovation"] = gensSinceInnovation; 
     
     // replay the champ
     // the best performer from the best species 
-    Genome champ = bestPerformingSpecies->members.front();
+    Genome champ = bestPerformingGenome; 
+    gen_json["champSpecies"] = champ.speciesID; 
     Environment replayEnv(ENV_WIDTH, ENV_HEIGHT);
     NeuralNetwork replayNet(champ, TANH);
 
@@ -571,6 +595,7 @@ double NEATRunner::calcCompDistance(Genome& parent1, Genome& parent2){
 void NEATRunner::keepTrackOfGenomeStats(Genome &genome){
     if(bestRawFit == 0.0 || genome.fitness > bestRawFit){
         bestRawFit = genome.fitness; 
+        bestPerformingGenome= genome; 
     }    
     if(worstRawFit == 0.0 || genome.fitness < worstRawFit){
         worstRawFit = genome.fitness; 
