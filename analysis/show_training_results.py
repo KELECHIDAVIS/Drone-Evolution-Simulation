@@ -15,7 +15,7 @@ from read_data import getConstantData, getGenerationData
 import graphviz 
 # ---------- User options ----------
 releaseMode = True
-GEN_STEP = 20             
+GEN_STEP = 1000             
 UPDATE_GRAPH_ON_GEN = True  # we update graphs only when generation changes
 # ----------------------------------
 
@@ -51,7 +51,7 @@ graphs_x = 2 * env_w
 graphs_y = 0
 graphs_w = env_w
 graphs_h = env_h
-nn_graph_w = env_w*2
+nn_graph_w = env_w
 nn_graph_h = env_h
 # bottom area (optional) — you can use for additional info if you want
 bottom_x = 0
@@ -259,6 +259,7 @@ def render_champ_neural_network(width ,height , filename='champion_nn'):
     #dot = dot.unflatten(stagger = 3)
     bestSpecies = genData.get('bestSpecies', 0) 
     genome  = genData.get('species',[])[bestSpecies].get('members', [])[0]
+    
     # Add nodes
     for node in genome["nodes"]:
         nid = str(node["id"])
@@ -286,7 +287,7 @@ def render_champ_neural_network(width ,height , filename='champion_nn'):
         dot.edge(in_node, out_node, label=f"{w:.2f}", color=color, penwidth=width)
 
     # Save & render
-    u = dot.unflatten(stagger=3)
+    u = dot.unflatten(stagger=2)
     u.render(filename, cleanup=True)
     
     nn_image = pygame.image.load(filename+".png")

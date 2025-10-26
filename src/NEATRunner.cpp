@@ -177,7 +177,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     }
     fit = .9*env.score + fit/SIM_LIFETIME ; 
 
-    return fit; //TODO: CHANGE FITNESS FUNCTION;
+    return fit; //TODO: MAKE SURE SCORE IS ACCURATEly getting updated when target is eaten  
 }
 std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
     env.reset();  
@@ -630,6 +630,7 @@ void NEATRunner::speciate()
             newSpecies.bestFitness = genome.fitness; 
             newSpecies.appearedInGen= genNum; 
             newSpecies.members.push_back(genome); 
+            newSpecies.gensSinceImprovement = 0; 
             speciesList.push_back(newSpecies); 
         }
     }
