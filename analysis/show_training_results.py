@@ -15,7 +15,7 @@ from read_data import getConstantData, getGenerationData
 
 # ---------- User options ----------
 releaseMode = True
-GEN_STEP = 50             
+GEN_STEP = 20             
 UPDATE_GRAPH_ON_GEN = True  # we update graphs only when generation changes
 # ----------------------------------
 
@@ -51,7 +51,8 @@ graphs_x = 2 * env_w
 graphs_y = 0
 graphs_w = env_w
 graphs_h = env_h
-
+nn_graph_w = env_w*2
+nn_graph_h = env_h
 # bottom area (optional) — you can use for additional info if you want
 bottom_x = 0
 bottom_y = env_h
@@ -250,6 +251,8 @@ def render_species_graph_to_surf(width, height):
 
     return surf
 
+def render_champ_neural_network(width ,height):
+    pass
 def get_rocket_vertices(data, frame_index):
     """Return vertices in Pygame coordinates (flip y-axis)."""
     # guard
@@ -316,8 +319,8 @@ def draw_layout_borders(surface):
     # horizontal split (top env vs bottom area)
     pygame.draw.rect(surface, (255, 255, 255), (0, 0, WINDOW_WIDTH, WINDOW_HEIGHT // 2), 1)
     # vertical boundaries (env, stats, graphs)
-    pygame.draw.rect(surface, (255, 255, 255), (0, 0, env_w, WINDOW_HEIGHT), 1)
-    pygame.draw.rect(surface, (255, 255, 255), (env_w, 0, env_w, WINDOW_HEIGHT), 1)
+    pygame.draw.rect(surface, (255, 255, 255), (0, 0, env_w, WINDOW_HEIGHT/2), 1)
+    pygame.draw.rect(surface, (255, 255, 255), (env_w, 0, env_w, WINDOW_HEIGHT/2), 1)
     pygame.draw.rect(surface, (255, 255, 255), (2 * env_w, 0, env_w, WINDOW_HEIGHT), 1)
 
 # Frame control
@@ -329,7 +332,8 @@ frame_delay = 60  # fps cap
 last_graph_gen = genData.get('generation', None)
 fps_font = pygame.font.SysFont("consolas", 18)
 graph_surface = render_fit_graphs_to_surface(graphs_w, graphs_h)
-graph_species = render_species_graph_to_surf(graphs_w, graphs_h)    
+graph_species = render_species_graph_to_surf(graphs_w, graphs_h)
+champ_nn_graph = render_champ_neural_network(nn_graph_w, nn_graph_h);     
 # Main loop
 while running:
     for event in pygame.event.get():

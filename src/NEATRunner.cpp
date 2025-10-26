@@ -149,10 +149,8 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     env.reset();  // Make sure you have this method!
     net.reset();
 
-    int hitCount = 0;
-    int totalFrames = 0;
-
     bool alive= true; 
+    double fit = 0; 
     for (int step = 0; step < SIM_LIFETIME; step++) {
 
         if(!alive) 
@@ -168,10 +166,18 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         env.rocket.setThrust(output(0));
         env.rocket.setRotation((int)(360 * output(1)));
 
+        // calculate fit 
+        double dist = env.distFromTarget() ; 
+        if (!approxEqual(0.0, dist, 1e-6)){ // if it is 0 it's alr account for 
+            fit+= 1/(dist*dist) ;  // squared distance 
+        }
+
         alive = env.update(0.016f);
 
     }
-    return env.score; //TODO: CHANGE FITNESS FUNCTION;
+    fit = .9*env.score + fit/SIM_LIFETIME ; 
+
+    return fit; //TODO: CHANGE FITNESS FUNCTION;
 }
 std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
     env.reset();  

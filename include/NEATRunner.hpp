@@ -51,11 +51,11 @@ public:
     static constexpr double PERTURB_DELTA = 0.1;
     static constexpr double WEIGHT_MIN = -1.0;
     static constexpr double WEIGHT_MAX = 1.0;
-    static constexpr double ADD_NODE_RATE = 0.03;
-    static constexpr double ADD_LINK_RATE = 0.3; // .05 // use 0.3 for very large pops
+    static constexpr double ADD_NODE_RATE = .03f; //0.03;
+    static constexpr double ADD_LINK_RATE = 0.1; // .05 // use 0.3 for very large pops
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
     C2=1.0f, // how much weight disjoint genes have  
-    C3= 3.0f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
+    C3= 3.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=4.0f; // should change for larger pops  
     int globalInnvNum=0;
     int genNum=0; 

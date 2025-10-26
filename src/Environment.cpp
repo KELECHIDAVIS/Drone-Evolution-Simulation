@@ -29,6 +29,14 @@ void Environment::reset() {
     target.respawn(windowWidth, windowHeight); 
     score = 0;
 }
+double Environment::distFromTarget(){
+    double dx = target.pos(0) - rocket.pos(0);
+    double dy = target.pos(1) - rocket.pos(1);
+
+    double dist = sqrt(dx * dx + dy * dy);
+
+    return dist; 
+}
 //CAN FURTHER OPTIMIZE THIS 
 // ONLY CHECK COLLISION IF THEy ARE CLOSE (euclidean distance is is <= diameter of target + height of rocket)
 // SAT between 
@@ -36,10 +44,7 @@ void Environment::reset() {
 bool Environment::checkCollision()
 {
     // first make sure they are close enough to check 
-    float dx = target.pos(0) - rocket.pos(0); 
-    float dy = target.pos(1) - rocket.pos(1);
-    
-    float dist = sqrt(dx*dx +dy*dy);
+    double dist = distFromTarget(); 
 
     float rocketRadius = std::sqrt(
         (Rocket::BASE / 2.f) * (Rocket::BASE / 2.f) +
