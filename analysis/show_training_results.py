@@ -15,7 +15,7 @@ from read_data import getConstantData, getGenerationData
 
 # ---------- User options ----------
 releaseMode = True
-GEN_STEP = 20             # how you iterate files (your setup uses 20)
+GEN_STEP = 50             
 UPDATE_GRAPH_ON_GEN = True  # we update graphs only when generation changes
 # ----------------------------------
 
@@ -32,7 +32,7 @@ pygame.init()
 WINDOW_WIDTH = constants['ENV_WIDTH'] * 3
 WINDOW_HEIGHT = constants['ENV_HEIGHT'] * 2
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption("Simulation Replay + Graphs")
+pygame.display.set_caption("Drone Simulation Analysis")
 font = pygame.font.SysFont("Space Mono", 20)
 clock = pygame.time.Clock()
 
@@ -70,6 +70,28 @@ gen_history = []
 avg_fit_history = []
 best_fit_history = []
 
+#species graph data 
+species_categories = [] # what species ith member belongs to 
+member_num_conn = []   #how much conns they have 
+member_num_nodes = []   # how many nodes 
+
+#Init information for connectivity graph 
+def get_species_connectivity(genData): 
+    #init species 
+    species_categories.clear()
+    member_num_conn.clear()
+    member_num_nodes.clear()   
+    for species in genData.get('species', []):
+        
+        species_id = species.get("id", 0)
+
+        for member in species.get('members', []):
+            species_categories.append(species_id)
+            conns = len(member.get('connections', 0 ))
+            nodes = len(member.get('nodes', 0 ))
+            member_num_nodes.append(nodes)
+            member_num_conn.append(conns)
+
 # Initialize history with first loaded generation
 def init_history_from_gen(genData):
     gen_history.clear()
@@ -79,6 +101,8 @@ def init_history_from_gen(genData):
         gen_history.append(genData.get('generation', 0))
         avg_fit_history.append(genData.get('avgRawFit', 0.0))
         best_fit_history.append(genData.get('bestRawFit', 0.0))
+        get_species_connectivity(genData)
+        
 
 init_history_from_gen(genData)
 
@@ -100,9 +124,10 @@ def update_graph_history_with_gen(genData):
         gen_history.append(gen)
         avg_fit_history.append(genData.get("avgRawFit", 0.0))
         best_fit_history.append(genData.get("bestRawFit", 0.0))
+        get_species_connectivity(genData) #reset species information
 
 
-def render_graphs_to_surface(width, height):
+def render_fit_graphs_to_surface(width, height):
     """Render matplotlib plots (avg & best fitness) into a Pygame surface."""
     if len(gen_history) == 0:
         return None
@@ -122,13 +147,38 @@ def render_graphs_to_surface(width, height):
 
     # Render and convert to RGBA
     canvas.draw()
-    raw_data = canvas.buffer_rgba()  # ✅ Correct in modern Matplotlib (ARGB → RGBA format)
+    raw_data = canvas.buffer_rgba()  
 
     # Convert to Pygame surface (RGBA)
     surface = pygame.image.frombuffer(raw_data, (width, height), "RGBA")
     plt.close(fig)
     return surface
 
+def render_species_graph_to_surf(width, height):
+    """Render matplotlib plots (avg & best fitness) into a Pygame surface."""
+    if len(species_categories) == 0:
+        return None
+
+    dpi = 100
+    fig = plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
+    canvas = FigureCanvas(fig)
+
+    # Plot correct data
+    plt.scatter(gen_history, avg_fit_history, label="Avg Raw Fit")
+    plt.xlabel("Nodes")
+    plt.ylabel("Connections")
+    plt.title("Population \"Connectivity\"")
+    plt.legend()
+    plt.tight_layout()
+
+    # Render and convert to RGBA
+    canvas.draw()
+    raw_data = canvas.buffer_rgba()  
+
+    # Convert to Pygame surface (RGBA)
+    surface = pygame.image.frombuffer(raw_data, (width, height), "RGBA")
+    plt.close(fig)
+    return surface
 
 def get_rocket_vertices(data, frame_index):
     """Return vertices in Pygame coordinates (flip y-axis)."""
@@ -247,7 +297,7 @@ while running:
     draw_stats_panel(screen, genData)
 
     # render graphs (only update figure when gen history changed - we keep this cheap)
-    graph_surface = render_graphs_to_surface(graphs_w, graphs_h)
+    graph_surface = render_fit_graphs_to_surface(graphs_w, graphs_h)
     screen.blit(graph_surface, (graphs_x, graphs_y))
 
     pygame.display.flip()
