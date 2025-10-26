@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
 from read_data import getConstantData, getGenerationData
-
+import graphviz 
 # ---------- User options ----------
 releaseMode = True
 GEN_STEP = 20             
@@ -251,8 +251,47 @@ def render_species_graph_to_surf(width, height):
 
     return surf
 
-def render_champ_neural_network(width ,height):
-    pass
+    # build and render the champ's neural network 
+def render_champ_neural_network(width ,height , filename='champion_nn'):
+    dot = graphviz.Digraph(format='png')
+    dot.attr(rankdir='LR')  # Left-to-right layout
+    dot.attr(bgcolor='black')  
+    #dot = dot.unflatten(stagger = 3)
+    bestSpecies = genData.get('bestSpecies', 0) 
+    genome  = genData.get('species',[])[bestSpecies].get('members', [])[0]
+    # Add nodes
+    for node in genome["nodes"]:
+        nid = str(node["id"])
+        ntype = node["type"]  # 0=input, 1=output, 2=hidden, 3=bias?
+        if ntype == 0:
+            dot.node(nid, f'In {nid}', shape='circle', style='filled', color='lightblue')
+        elif ntype == 1:
+            dot.node(nid, f'Out {nid}', shape='doublecircle', style='filled', color='lightgreen')
+        elif ntype == 3:
+            dot.node(nid, f'Bias', shape='circle', style='filled', color='yellow')
+        else:
+            dot.node(nid, f'H {nid}', shape='circle', style='filled', color='white')
+
+    # Add connections
+    for conn in genome["connections"]:
+        if not conn["isEnabled"]:
+            continue
+        in_node = str(conn["inId"])
+        out_node = str(conn["outId"])
+        w = conn["weight"]
+
+        color = "green" if w > 0 else "red"
+        width = str(min(max(abs(w) * 2, 0.2), 3))  # thicker lines = stronger connections
+
+        dot.edge(in_node, out_node, label=f"{w:.2f}", color=color, penwidth=width)
+
+    # Save & render
+    u = dot.unflatten(stagger=3)
+    u.render(filename, cleanup=True)
+    
+    nn_image = pygame.image.load(filename+".png")
+    nn_image = pygame.transform.smoothscale(nn_image, (env_w*2, env_h))
+    return nn_image
 def get_rocket_vertices(data, frame_index):
     """Return vertices in Pygame coordinates (flip y-axis)."""
     # guard
@@ -367,7 +406,8 @@ while running:
                 update_graph_history_with_gen(genData)
                 last_graph_gen = genData.get('generation', last_graph_gen)
                 graph_surface = render_fit_graphs_to_surface(graphs_w, graphs_h)
-                graph_species = render_species_graph_to_surf(graphs_w, graphs_h)    
+                graph_species = render_species_graph_to_surf(graphs_w, graphs_h)  
+                champ_nn_graph = render_champ_neural_network( nn_graph_w,nn_graph_h)  
         else:
             current_frame += 1
 
@@ -382,6 +422,8 @@ while running:
         screen.blit(graph_surface, (graphs_x, graphs_y))
     if graph_species:
         screen.blit(graph_species, (graphs_x, env_h))
+    if champ_nn_graph:
+        screen.blit(champ_nn_graph, (0, env_h))
 
     fps = clock.get_fps()
     if fps >= 60:
