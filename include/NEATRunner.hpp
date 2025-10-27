@@ -125,7 +125,9 @@ public:
     void crossover();
 
     // this is going to make use of parallelism to test out genomes efficiently
-    void testOutGenomes(); 
+    void testOutGenomes();
+    void testDeterminism(const Genome &genome, int numRuns);
+
     std::vector<ReplayFrame> evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay); 
     double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env); 
     // record the results for the generation 

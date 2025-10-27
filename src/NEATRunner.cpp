@@ -36,6 +36,13 @@ void NEATRunner::saveConstants(const std::filesystem::path& dir_path){
 }
 NEATRunner::NEATRunner()
 {
+    // IMPORTANT: Seed RNG at the start of the simulation
+    // For deterministic testing, use a fixed seed:
+    RNGManager::seed(12345); // or read from config
+
+    // For non-deterministic runs (normal evolution):
+    // RNGManager::seedRandom();
+
     for (int i =0; i< POP_SIZE; i++){
         Genome genome = initGenome(); 
         genomes.push_back(genome); 
@@ -258,6 +265,7 @@ void NEATRunner::testOutGenomes() {
             );
         });
 }
+
 
 
 
