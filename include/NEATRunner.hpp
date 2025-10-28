@@ -18,7 +18,7 @@ struct ReplayFrame{
     std::pair<float,float> vertex1;
     std::pair<float,float> vertex2;
     std::pair<float, float> vertex3;
-
+    bool valid = false; // init to false to replay purposes 
     nlohmann::json to_json() const {
         nlohmann::json frame_json{
             {"frame", frame},
@@ -58,6 +58,7 @@ public:
     C2=1.0f, // how much weight disjoint genes have  
     C3= .4f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=4.0f; // should change for larger pops  
+    static constexpr float HITS_FIT_MULTIPLIER=1000, TIME_EFFICIENCY_FIT_MULTIPLIER =5, DISTANCE_FIT_MULTIPLIER=50; 
     int globalInnvNum=0;
     int genNum=0; 
     double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
@@ -70,12 +71,14 @@ public:
     double  bestRawFit; 
     double  worstRawFit; 
     double  worstAdjFit; 
-    
     std::vector<Genome> genomes ;
     std::vector<NeuralNetwork> networks; 
     std::vector<Environment> environments;  
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
     std::vector<Species> speciesList;
+    ReplayFrame genFrames[POP_SIZE][SIM_LIFETIME]; 
+    size_t bestReplayIndex ; // the genome that has the best replay 
+
 
     void clearDir(const std::filesystem::path &dir_path);
 
@@ -128,8 +131,8 @@ public:
     void testOutGenomes();
     void testDeterminism(const Genome &genome, int numRuns);
 
-    std::vector<ReplayFrame> evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay); 
-    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env); 
+    
+    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, ReplayFrame *frames); 
     // record the results for the generation 
     void saveGenerationResults(); 
 

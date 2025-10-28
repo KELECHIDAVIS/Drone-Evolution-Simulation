@@ -153,7 +153,8 @@ void NEATRunner::runGeneration()
 }
 
 // Single genome evaluation (non-parallel)
-double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env) {
+//TODO: could possibly optimize since most genomes don't use all the frames in their sim lifetime and only live a fraction of that 
+double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, ReplayFrame* frames ) {
     env.reset();
     net.reset();
 
@@ -184,72 +185,50 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         int previousHits = env.score;
         alive = env.update(0.016f);
 
+
         if (env.score > previousHits)
         {
             numHits++;
             totalTimeToHit += step; // Time penalty for slow hits
         }
+
+        //store frames
+        Eigen::Matrix<float, 2,3> vertices = env.rocket.getVertices();
+        frames[step] = {
+            step,
+            env.rocket.getRotation(),
+            env.rocket.getThrust(),
+            env.rocket.pos(0),
+            env.rocket.pos(1),
+            env.target.pos(0),
+            env.target.pos(1),
+            {vertices(0, 0), vertices(1, 0)},
+            {vertices(0, 1), vertices(1, 1)},
+            {vertices(0, 2), vertices(1, 2)},
+            true // it is a valid frame 
+        };
     }
 
     double fitness = 0.0;
 
     // Primary objective: number of hits (heavily weighted)
-    fitness += numHits * 1000.0;
+    fitness += numHits * HITS_FIT_MULTIPLIER; 
 
     // Secondary: efficiency (fewer steps to get hits)
     if (numHits > 0)
     {
         double avgTimePerHit = totalTimeToHit / numHits;
         double timeEfficiency = 1.0 - (avgTimePerHit / SIM_LIFETIME);
-        fitness += numHits * timeEfficiency * 500.0;
+        fitness += numHits * timeEfficiency * TIME_EFFICIENCY_FIT_MULTIPLIER;
     }
 
     // Tertiary: encourage approaching targets even without hits
-    double distanceReward = (1.0 - (closestDistance / std::max(ENV_WIDTH, ENV_HEIGHT))) * 50.0;
+    double distanceReward = (1.0 - (closestDistance / std::max(ENV_WIDTH, ENV_HEIGHT))) * DISTANCE_FIT_MULTIPLIER;
     fitness += distanceReward;
 
     return std::max(0.0, fitness); // Ensure non-negative //TODO: MAKE SURE SCORE IS ACCURATEly getting updated when target is eaten
 }
-std::vector<ReplayFrame> NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, bool replay) {
-    env.reset();  
-    net.reset();
-    
-    bool alive = true; 
-    std::vector<ReplayFrame> frames; 
 
-    for (int step = 0; step < SIM_LIFETIME; step++) {
-        if(!alive)
-            break; 
-
-        if(replay){
-            Eigen::Matrix<float, 2, 3>  verts = env.getRocketVertices();
-            ReplayFrame frame = {
-                step,
-                env.rocket.getRotation(),
-                env.rocket.getThrust(),
-                env.rocket.pos(0),
-                env.rocket.pos(1),
-                env.target.pos(0),
-                env.target.pos(1),
-                {verts(0, 0), verts(1 , 0)},
-                {verts(0, 1), verts(1, 1)},
-                {verts(0,2), verts(1, 2)},
-            };
-            frames.push_back(frame); 
-        }
-        Eigen::VectorXd input(4);
-        input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
-        input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
-        input(2) = env.rocket.vel(0) / Rocket::MAX_VEL;
-        input(3) = env.rocket.vel(1) / Rocket::MAX_VEL;
-        
-        Eigen::VectorXd output = net.feedForward(input);
-        env.rocket.setThrust(output(0));
-        env.rocket.setRotation((int)(360 * output(1)));
-        alive = env.update(0.016f);
-    }
-    return frames; 
-}
 
 // Parallel wrapper
 void NEATRunner::testOutGenomes() {
@@ -261,9 +240,20 @@ void NEATRunner::testOutGenomes() {
             genomes[idx].fitness = evaluateGenome(
                 genomes[idx], 
                 networks[idx], 
-                environments[idx]
+                environments[idx],
+                genFrames[idx]
             );
         });
+
+    auto bestIt = std::max_element(
+        genomes.begin(),
+        genomes.end(),
+        [](const Genome &a, const Genome &b)
+        {
+            return a.fitness < b.fitness;
+        });
+
+    size_t bestIndex = std::distance(genomes.begin(), bestIt);
 }
 
 
@@ -293,21 +283,13 @@ void NEATRunner::saveGenerationResults()
     gen_json["worstSpecies"] = worstPerformingSpecies->id; 
     gen_json["gensSinceInnovation"] = gensSinceInnovation; 
     
-    // replay the champ
-    // the best performer from the best species 
-    Genome champ = bestPerformingGenome; 
-    gen_json["champSpecies"] = champ.speciesID; 
-    Environment replayEnv(ENV_WIDTH, ENV_HEIGHT);
-    NeuralNetwork replayNet(champ, TANH);
-
-    std::vector<ReplayFrame> championReplayFrames = evaluateGenome(
-        champ, 
-        replayNet, 
-        replayEnv, 
-        true
-    ); 
+    // get champs replay
     
-    for (const ReplayFrame& frame : championReplayFrames) {
+    for (int i =0 ; i< SIM_LIFETIME; i++) {
+        ReplayFrame &frame = genFrames[bestReplayIndex][i]; 
+        if(!frame.valid)
+            break; 
+
         gen_json["champReplayFrames"].push_back(frame.to_json()); 
     }
 
