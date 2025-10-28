@@ -456,26 +456,36 @@ Species& NEATRunner::selectRandomSpecies(){
 //TODO: stagnant species should not be allowed to reproduce ; if best fitness of a species hasn't gone up in 15 gens don't allow it to reproduce  
 void NEATRunner::crossover()
 {
-    std::vector<Genome> nextGen; 
-    int spotsLeft = POP_SIZE; 
+    std::vector<Genome> nextGen;
+    nextGen.reserve(genomes.size());
+    int spotsLeft = genomes.size();
+    //TODO: REMOVE TESTING CODE 
+    using namespace std; 
+    cout<<"Spots left: "<<spotsLeft<<'\t'; 
     for(Species& species: speciesList){
+        cout<<"Species "<<species.id<<": \t"; 
         // calc what proportion of the population their offspring should make up in the next generation 
         float proportion= species.sumOfAdjFits/((float) totalAdjFit); 
-        int numOffSpring= floor(proportion*POP_SIZE); //round down 
+        cout<<"Proportion: "<<proportion<<'\t';
+        int numOffSpring = floor(proportion * genomes.size()); // round down
+        cout<<"Num OffSpring: "<<numOffSpring<<'\t'; 
         
         
         // if the case happens that it's greater than the max, set to it 
         if (numOffSpring > spotsLeft) numOffSpring = spotsLeft; 
 
-        spotsLeft -= numOffSpring; 
+        spotsLeft -= numOffSpring;
+        cout << "Spots left after species offspring subtraction: " << spotsLeft << '\t';
 
-        
         std::sort(species.members.begin(), species.members.end(), 
         [](const Genome& a, const Genome& b) { return a.fitness > b.fitness; });
 
 
-        int newSize = std::ceil(species.members.size()/2.0) ; // remove bottom half 
+        int newSize = std::ceil(species.members.size()/2.0) ; // remove bottom half
+        cout << "NewSize of species: " << newSize<< '\t';
+
         species.members.resize(newSize); 
+        cout << "Amt of Members after removing half: " <<species.members.size() << '\t';
 
         
         for ( int j=0; j< numOffSpring; j++){
@@ -512,10 +522,10 @@ void NEATRunner::crossover()
             nextGen.push_back(offspring);
         }
 
-
-        
+        cout << "NextGen Array Size: " << nextGen.size() << '\t';
     }
-    // if there are left over spots give to the best species 
+    // if there are left over spots give to the best species
+    cout << "Spots left over for best performing species: " << spotsLeft << '\t';
 
     for(int i = spotsLeft; i>0; i--){
         Genome& parent1 = selectParentFromSpecies(*bestPerformingSpecies);
@@ -525,7 +535,7 @@ void NEATRunner::crossover()
     }
 
     // set current gen = to next gen 
-    genomes = nextGen; 
+    genomes = std::move(nextGen); 
 }
 
 
