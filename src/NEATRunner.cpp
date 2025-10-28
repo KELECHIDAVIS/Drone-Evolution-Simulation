@@ -165,6 +165,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 
     for (int step = 0; step < SIM_LIFETIME; step++)
     {
+        assert(step < SIM_LIFETIME);
         if (!alive)
             break;
 
@@ -234,9 +235,13 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 void NEATRunner::testOutGenomes() {
     std::vector<size_t> indices(genomes.size());
     std::iota(indices.begin(), indices.end(), 0);
-    
+
+    assert(genomes.size() <= POP_SIZE && "genomes exceeds genFrames allocation");
+
     std::for_each(std::execution::par, indices.begin(), indices.end(),
         [this](size_t idx) {
+            assert(idx < POP_SIZE && "index out of bounds for genFrames");
+
             genomes[idx].fitness = evaluateGenome(
                 genomes[idx], 
                 networks[idx], 

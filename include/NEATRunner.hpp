@@ -42,23 +42,23 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 300; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 10; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static constexpr int SIM_LIFETIME =1500; // how many frames each genome gets  
+    static constexpr int SIM_LIFETIME =10; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
-    static constexpr float INIT_CONNECTIVITY_RATE= .85; // originally .5
+    static constexpr float INIT_CONNECTIVITY_RATE= .40; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
     static constexpr double PERTURB_DELTA = 0.1;
     static constexpr double WEIGHT_MIN = -1.0;
     static constexpr double WEIGHT_MAX = 1.0;
-    static constexpr double ADD_NODE_RATE = .03f; //0.03;
-    static constexpr double ADD_LINK_RATE = 0.05f; // .05 // use 0.3 for very large pops
+    static constexpr double ADD_NODE_RATE = .05f; //0.03;
+    static constexpr double ADD_LINK_RATE = 0.12f; // .05 // use 0.3 for very large pops
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
     C2=1.0f, // how much weight disjoint genes have  
-    C3= .4f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
-    COMP_THRESHOLD=4.0f; // should change for larger pops  
-    static constexpr float HITS_FIT_MULTIPLIER=1000, TIME_EFFICIENCY_FIT_MULTIPLIER =5, DISTANCE_FIT_MULTIPLIER=50; 
+    C3= 1.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
+    COMP_THRESHOLD=3.0f; // should change for larger pops  
+    static constexpr float HITS_FIT_MULTIPLIER= 1000, TIME_EFFICIENCY_FIT_MULTIPLIER =5, DISTANCE_FIT_MULTIPLIER=50; 
     int globalInnvNum=0;
     int genNum=0; 
     double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
