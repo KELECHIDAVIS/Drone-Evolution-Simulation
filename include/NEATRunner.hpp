@@ -7,11 +7,12 @@
 #include <filesystem>
 
 
+// fix memory issues with the genFrame array; each frame may be too big of an object
 struct ReplayFrame{
-    int frame; 
-    int rocketRotation; 
-    float rocketThrust; 
-    double rocketX; 
+    int frame; //0 -> sim_lifetime
+    int rocketRotation; //0 -> 360 
+    float rocketThrust; // 0->1
+    double rocketX;  
     double rocketY; 
     double targetX; 
     double  targetY; 
