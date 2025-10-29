@@ -259,7 +259,7 @@ void NEATRunner::testOutGenomes() {
             return a.fitness < b.fitness;
         });
 
-    size_t bestIndex = std::distance(genomes.begin(), bestIt);
+    bestReplayIndex= std::distance(genomes.begin(), bestIt);
 }
 
 
