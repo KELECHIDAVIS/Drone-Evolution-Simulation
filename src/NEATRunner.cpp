@@ -154,7 +154,7 @@ void NEATRunner::runGeneration()
 
 // Single genome evaluation (non-parallel)
 //TODO: could possibly optimize since most genomes don't use all the frames in their sim lifetime and only live a fraction of that 
-double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, ReplayFrame* frames ) {
+double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, int genomeIndx) {
     env.reset();
     net.reset();
 
@@ -195,7 +195,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 
         //store frames
         Eigen::Matrix<float, 2,3> vertices = env.rocket.getVertices();
-        frames[step] = {
+        genFrames[genomeIndx][step] = {
             step,
             env.rocket.getRotation(),
             env.rocket.getThrust(),
@@ -246,10 +246,11 @@ void NEATRunner::testOutGenomes() {
                 genomes[idx], 
                 networks[idx], 
                 environments[idx],
-                genFrames[idx]
+                idx
             );
         });
 
+    // find the best performer
     auto bestIt = std::max_element(
         genomes.begin(),
         genomes.end(),
@@ -289,7 +290,9 @@ void NEATRunner::saveGenerationResults()
     gen_json["gensSinceInnovation"] = gensSinceInnovation; 
     
     // get champs replay
-    
+    bool champInBounds = bestReplayIndex>=0 && bestReplayIndex < POP_SIZE; 
+    std::cout<<"BestReplayIndex = "<< bestReplayIndex <<"\n"; 
+    assert(champInBounds && "The Best Replay Index Was Outside The Bounds of Population"); 
     for (int i =0 ; i< SIM_LIFETIME; i++) {
         ReplayFrame &frame = genFrames[bestReplayIndex][i]; 
         if(!frame.valid)

@@ -42,9 +42,9 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 10; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 20; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static constexpr int SIM_LIFETIME =10; // how many frames each genome gets  
+    static constexpr int SIM_LIFETIME =100; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
     static constexpr float INIT_CONNECTIVITY_RATE= .40; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
@@ -132,7 +132,7 @@ public:
     void testDeterminism(const Genome &genome, int numRuns);
 
     
-    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, ReplayFrame *frames); 
+    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, int genomeIndx); 
     // record the results for the generation 
     void saveGenerationResults(); 
 
