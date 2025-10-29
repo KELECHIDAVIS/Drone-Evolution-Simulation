@@ -8,9 +8,10 @@
 
 
 // fix memory issues with the genFrame array; each frame may be too big of an object
+//TODO: make the data types the most memory efficient to save space 
 struct ReplayFrame{
-    int frame; //0 -> sim_lifetime
-    int rocketRotation; //0 -> 360 
+    unsigned short frame; //0 -> sim_lifetime
+    unsigned short rocketRotation; //0 -> 360 
     float rocketThrust; // 0->1
     double rocketX;  
     double rocketY; 
