@@ -258,13 +258,20 @@ def render_champ_neural_network(width ,height , filename='champion_nn'):
     #dot = dot.unflatten(stagger = 3)
     champSpecies = genData.get('champSpecies', 0) 
     genome  = genData.get('species',[])[champSpecies].get('members', [])[0]
-    
+    node_names= {
+        0: 'x dist',
+        1: 'y dist',
+        2: 'x vel',
+        3:'y vel',
+        5:'thrust',
+        6: 'angle'
+    }
     # Add nodes
     for node in genome["nodes"]:
         nid = str(node["id"])
         ntype = node["type"]  # 0=input, 1=output, 2=hidden, 3=bias?
         if ntype == 0:
-            dot.node(nid, f'In {nid}', shape='circle', style='filled', color='lightblue')
+            dot.node(nid, f'{nid}', shape='circle', style='filled', color='lightblue')
         elif ntype == 1:
             dot.node(nid, f'Out {nid}', shape='doublecircle', style='filled', color='lightgreen')
         elif ntype == 3:
