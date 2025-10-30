@@ -44,9 +44,9 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 20; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
-    static constexpr int SIM_LIFETIME =100; // how many frames each genome gets  
+    static constexpr int SIM_LIFETIME =1000; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
     static constexpr float INIT_CONNECTIVITY_RATE= .40; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
@@ -78,7 +78,7 @@ public:
     std::vector<Environment> environments;  
     std::unordered_map<std::pair<int,int>, int, pair_hash> innvTracker ; // keep track of connections 
     std::vector<Species> speciesList;
-    ReplayFrame genFrames[POP_SIZE][SIM_LIFETIME]; 
+    std::vector<std::vector<ReplayFrame>> genFrames; // [POPSIZE][SIMLIFETIME] 
     size_t bestReplayIndex ; // the genome that has the best replay 
 
 

@@ -56,7 +56,10 @@ NEATRunner::NEATRunner()
         environments.push_back(env); 
     }
 
+    genFrames.resize(POP_SIZE); // resize to create inner vectors 
 
+    for( std::vector<ReplayFrame> & frames : genFrames)
+        frames.reserve (SIM_LIFETIME); // reserve the max capacity 
     // Create data directory if it doesn't exist
     const std::filesystem::path dir = "simulation_data"; 
 
@@ -195,7 +198,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 
         //store frames
         Eigen::Matrix<float, 2,3> vertices = env.rocket.getVertices();
-        genFrames[genomeIndx][step] = {
+        ReplayFrame frame = {
             step,
             env.rocket.getRotation(),
             env.rocket.getThrust(),
@@ -208,6 +211,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
             {vertices(0, 2), vertices(1, 2)},
             true // it is a valid frame 
         };
+        genFrames[genomeIndx].push_back(frame); 
     }
 
     double fitness = 0.0;
@@ -293,11 +297,7 @@ void NEATRunner::saveGenerationResults()
     bool champInBounds = bestReplayIndex>=0 && bestReplayIndex < POP_SIZE; 
     std::cout<<"BestReplayIndex = "<< bestReplayIndex <<"\n"; 
     assert(champInBounds && "The Best Replay Index Was Outside The Bounds of Population"); 
-    for (int i =0 ; i< SIM_LIFETIME; i++) {
-        ReplayFrame &frame = genFrames[bestReplayIndex][i]; 
-        if(!frame.valid)
-            break; 
-
+    for (ReplayFrame& frame: genFrames[bestReplayIndex]) {
         gen_json["champReplayFrames"].push_back(frame.to_json()); 
     }
 
