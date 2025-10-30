@@ -44,11 +44,11 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 150; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 250; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static constexpr int SIM_LIFETIME =1000; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
-    static constexpr float INIT_CONNECTIVITY_RATE= .40; // originally .5
+    static constexpr float INIT_CONNECTIVITY_RATE= .65; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
     static constexpr double PERTURB_DELTA = 0.1;
@@ -60,7 +60,7 @@ public:
     C2=1.0f, // how much weight disjoint genes have  
     C3= 1.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=3.0f; // should change for larger pops  
-    static constexpr float HITS_FIT_MULTIPLIER= 1000, TIME_EFFICIENCY_FIT_MULTIPLIER =5, DISTANCE_FIT_MULTIPLIER=50; 
+    static constexpr float HITS_FIT_MULTIPLIER= 1000, TIME_EFFICIENCY_FIT_MULTIPLIER =5, DISTANCE_FIT_MULTIPLIER=200; 
     int globalInnvNum=0;
     int genNum=0; 
     double totalAdjFit=0; // sum of the sumAdjFit for each species; used to calc proportion of population each species should have    
