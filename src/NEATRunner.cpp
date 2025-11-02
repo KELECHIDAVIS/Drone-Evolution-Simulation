@@ -149,18 +149,31 @@ Genome NEATRunner::createGenome(int numInputs, int numBiases, int numOutputs, co
     return genome;
 }
 
+void NEATRunner::initNetworksForGenomes()   {
+    networks.clear(); 
+    //environments.clear(); //  don't have to do for envs since they are already reset every test and isn't dependent on genome  
+    for (Genome & genome: genomes){
+       NeuralNetwork network = NeuralNetwork(genome , TANH); 
+       networks.push_back(network);  
+    }
+}
 void NEATRunner::runGeneration()
 {
     gensSinceInnovation += 1;
-
-    // TODO: INIT GENOMES  AND NETWORKS FOR EACH OF THEM
+    
+    //
+    // for new genomes need to make sure their networks and envs are initialized based on genome  
+    if (genNum> 0 ) // on first they are already made 
+        initNetworksForGenomes();     
+    
     testOutGenomes();
-
+    
     speciate();
-
+    
     crossover();
-
+    
     mutate();
+    
 
     saveGenerationResults();
 

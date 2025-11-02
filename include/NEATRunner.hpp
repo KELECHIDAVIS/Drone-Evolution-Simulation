@@ -132,10 +132,9 @@ public:
 
     // this is going to make use of parallelism to test out genomes efficiently
     void testOutGenomes();
-    void testDeterminism(const Genome &genome, int numRuns);
+    void initNetworksForGenomes(); 
 
-    
-    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, int genomeIndx); 
+    double evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, int genomeIndx);
     // record the results for the generation 
     void saveGenerationResults(); 
 
