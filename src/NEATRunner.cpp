@@ -329,7 +329,7 @@ void NEATRunner::saveGenerationResults()
     // get champs replay
     bool champInBounds = bestReplayIndex >= 0 && bestReplayIndex < POP_SIZE;
     assert(champInBounds && "The Best Replay Index Was Outside The Bounds of Population");
-    std::cout<<"Best Replay Index: "<<bestReplayIndex<< "\t replaysize: "<<genFrames[bestReplayIndex].size()<<'\n'; 
+    // std::cout<<"Best Replay Index: "<<bestReplayIndex<< "\t replaysize: "<<genFrames[bestReplayIndex].size()<<'\n'; 
     for (ReplayFrame &frame : genFrames[bestReplayIndex])
     {
         if (!frame.valid)

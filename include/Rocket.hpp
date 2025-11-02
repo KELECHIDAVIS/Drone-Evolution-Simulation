@@ -5,8 +5,8 @@
 class Rocket{
 public:         
     static constexpr float MASS = 1;
-    static constexpr int BASE = 15;
-    static constexpr int HEIGHT= 30;
+    static constexpr int BASE = 8;
+    static constexpr int HEIGHT= 16;
     int rotation=0; // 0-360 , start at 0
     float thrust=0.0f; // 0-1
     
@@ -15,9 +15,9 @@ public:
     Eigen::Vector2f pos; 
     Eigen::Vector2f vel;  
 
-    static constexpr float GRAVITY = 35; //350; 
-    static constexpr float MAX_THRUST =200;// 700; 
-    static constexpr float MAX_VEL = 500; 
+    static constexpr float GRAVITY = 35;  
+    static constexpr float MAX_THRUST =250;
+    static constexpr float MAX_VEL = 300; 
     
     Rocket(float x, float y ){
         pos<<x , y; 
