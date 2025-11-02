@@ -238,6 +238,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
             true // it is a valid frame
         };
         genFrames[genomeIndx].push_back(frame);
+    
     }
 
     double fitness = 0.0;
@@ -255,11 +256,11 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 
     // Tertiary: encourage approaching targets even without hits
     endingDistanceFromTarget = env.distFromTarget();
-    // max it could be it the hypotenuse of the screen
-    
     double distanceReward = (1.0 - (endingDistanceFromTarget /MAX_TARGET_DIST)) * DISTANCE_FIT_MULTIPLIER;
     fitness += distanceReward;
 
+    // also reward living long 
+    fitness += (1.0 - (genFrames[genomeIndx].size()/SIM_LIFETIME)) *TIME_LIVED_MULTIPLIER; 
     return std::max(0.0, fitness); // Ensure non-negative //TODO: MAKE SURE SCORE IS ACCURATEly getting updated when target is eaten
 }
 
@@ -329,7 +330,7 @@ void NEATRunner::saveGenerationResults()
     // get champs replay
     bool champInBounds = bestReplayIndex >= 0 && bestReplayIndex < POP_SIZE;
     assert(champInBounds && "The Best Replay Index Was Outside The Bounds of Population");
-    // std::cout<<"Best Replay Index: "<<bestReplayIndex<< "\t replaysize: "<<genFrames[bestReplayIndex].size()<<'\n'; 
+    std::cout<<"Best Replay Index: "<<bestReplayIndex<< "\t replaysize: "<<genFrames[bestReplayIndex].size()<<'\n'; 
     for (ReplayFrame &frame : genFrames[bestReplayIndex])
     {
         if (!frame.valid)
@@ -879,7 +880,7 @@ void NEATRunner::perturbConnections(Genome &genome)
     {
         if (getRandNum(0, 1) < WEIGHT_PERTURB_CHANCE)
         {
-            double delta = getRandNum(-.2, 2);
+            double delta = getRandNum(-PERTURB_DELTA, PERTURB_DELTA);  
             conn.weight += delta;
             conn.weight = std::clamp(conn.weight, WEIGHT_MIN, WEIGHT_MAX); // keep within range
         }

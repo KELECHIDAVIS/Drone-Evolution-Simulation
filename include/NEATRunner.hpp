@@ -44,23 +44,23 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 200; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 100; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static constexpr int SIM_LIFETIME =500; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
     static constexpr float INIT_CONNECTIVITY_RATE= .65; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
-    static constexpr double PERTURB_DELTA = 0.1;
+    static constexpr double PERTURB_DELTA = 0.25;
     static constexpr double WEIGHT_MIN = -1.0;
     static constexpr double WEIGHT_MAX = 1.0;
     static constexpr double ADD_NODE_RATE = .05f; //0.03;
-    static constexpr double ADD_LINK_RATE = 0.12f; // .05 // use 0.3 for very large pops
+    static constexpr double ADD_LINK_RATE = 0.2f; // .05 // use 0.3 for very large pops
     static constexpr float C1=1.0f, // how much weights excess genes have in differentiating species
     C2=1.0f, // how much weight disjoint genes have  
     C3= 1.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=3.0f; // should change for larger pops  
-    static constexpr float HITS_FIT_MULTIPLIER= 100, TIME_EFFICIENCY_FIT_MULTIPLIER =10, DISTANCE_FIT_MULTIPLIER=30; 
+    static constexpr float HITS_FIT_MULTIPLIER= 120, TIME_EFFICIENCY_FIT_MULTIPLIER =30, DISTANCE_FIT_MULTIPLIER=120, TIME_LIVED_MULTIPLIER =100; 
     double MAX_TARGET_DIST = std::sqrt( ENV_HEIGHT*ENV_HEIGHT + ENV_WIDTH*ENV_WIDTH); 
     int globalInnvNum=0;
     int genNum=0; 
