@@ -44,7 +44,7 @@ struct ReplayFrame{
 }; 
 class NEATRunner{
 public:
-    static constexpr int POP_SIZE = 100; // can go up to popsize = 1000 if needed  
+    static constexpr int POP_SIZE = 1; // can go up to popsize = 1000 if needed  
     static constexpr int ENV_WIDTH = 400, ENV_HEIGHT=400; 
     static constexpr int SIM_LIFETIME =500; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness

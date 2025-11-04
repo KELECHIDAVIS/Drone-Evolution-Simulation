@@ -30,6 +30,24 @@ public:
     void dfs(int currNode, std::unordered_set<int> &visited, std::unordered_map<int, 
         std::vector<int>> &adjList, std::vector<int> &evalOrder){
         
+        using namespace std; 
+        cout<<"Visited: "; 
+        for (int nodes : visited ){
+            cout<<nodes<<" "; 
+        }cout<<"\n"; 
+
+        cout<<"adjList Contents [\n "; 
+        for (auto& pair : adjList ){
+            cout<<pair.first<<": "; 
+            for(int neighbor : pair.second){
+                cout<<neighbor <<" ";
+            }cout<<"\n"; 
+        }cout<<"]\n";
+
+        cout<<"Eval order: "; 
+        for (int nodes : evalOrder ){
+            cout<<nodes<<" "; 
+        }cout<<"\n"; 
         // if no children (output node ), mark visited and add to eval 
         if(adjList.find(currNode) == adjList.end() )
             adjList[currNode] ; // make empty list for no children 

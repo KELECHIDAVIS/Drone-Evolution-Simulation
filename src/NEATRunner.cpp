@@ -82,16 +82,18 @@ Genome NEATRunner::initGenome() // at the start of the sim
 
     genome.addNode(NodeType::INPUT);  // 0 - target relative x
     genome.addNode(NodeType::INPUT);  // 1 - target relative y
-    genome.addNode(NodeType::INPUT);  // 2 - rocket x vel
-    genome.addNode(NodeType::INPUT);  // 3 - rocket y vel
-    genome.addNode(NodeType::BIAS);   // 4 - bias
-    genome.addNode(NodeType::OUTPUT); // 5 - rocket thrust
-    genome.addNode(NodeType::OUTPUT); // 6 - rocket rotation
+    genome.addNode(NodeType::INPUT);  // 2 - rocket x
+    genome.addNode(NodeType::INPUT);  // 3 - rocket y
+    genome.addNode(NodeType::INPUT);  // 4 - rocket x vel
+    genome.addNode(NodeType::INPUT);  // 5 - rocket y vel
+    genome.addNode(NodeType::BIAS);   // 6 - bias
+    genome.addNode(NodeType::OUTPUT); // 7 - rocket thrust
+    genome.addNode(NodeType::OUTPUT); // 8 - rocket rotation
 
     // 50% chance per connection
-    for (int in = 0; in <= 4; ++in)
+    for (int in = 0; in <= 6; ++in)
     {
-        for (int out = 5; out <= 6; ++out)
+        for (int out = 7; out <= 8; ++out)
         {
             if (getRandNum(0, 1) < INIT_CONNECTIVITY_RATE)
             {
@@ -204,8 +206,10 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         Eigen::VectorXd input(4);
         input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
         input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
-        input(2) = env.rocket.vel(0) / Rocket::MAX_VEL;
-        input(3) = env.rocket.vel(1) / Rocket::MAX_VEL;
+        input(2) = ( env.rocket.pos(0)) / ENV_WIDTH;
+        input(3) = (env.rocket.pos(1)) / ENV_HEIGHT;
+        input(4) = env.rocket.vel(0) / Rocket::MAX_VEL;
+        input(5) = env.rocket.vel(1) / Rocket::MAX_VEL;
 
         Eigen::VectorXd output = net.feedForward(input);
         env.rocket.setThrust(output(0));
