@@ -67,7 +67,7 @@ public:
     C2=1.5f, // how much weight disjoint genes have  
     C3= 1.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=3.5f; // should change for larger pops  
-    static constexpr float HITS_FIT_MULTIPLIER= 1000, TIME_EFFICIENCY_FIT_MULTIPLIER =20, DISTANCE_FIT_MULTIPLIER=2;  
+    static constexpr float HITS_FIT_MULTIPLIER= 4000, TIME_EFFICIENCY_FIT_MULTIPLIER =20, DISTANCE_FIT_MULTIPLIER=2;  
     double MAX_TARGET_DIST = std::sqrt( ENV_HEIGHT*ENV_HEIGHT + ENV_WIDTH*ENV_WIDTH); 
     int globalInnvNum=0;
     int genNum=0; 

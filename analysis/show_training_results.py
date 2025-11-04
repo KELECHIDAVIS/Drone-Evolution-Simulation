@@ -15,7 +15,7 @@ from read_data import getConstantData, getGenerationData
 import graphviz 
 # ---------- User options ----------
 releaseMode = True
-GEN_STEP = 10             
+GEN_STEP = 50             
 UPDATE_GRAPH_ON_GEN = True  # we update graphs only when generation changes
 # ----------------------------------
 
@@ -261,23 +261,27 @@ def render_champ_neural_network(width ,height , filename='champion_nn'):
     node_names= {
         0: 'x dist',
         1: 'y dist',
-        2: 'x vel',
-        3:'y vel',
-        5:'thrust',
-        6: 'angle'
+        2: 'x pos',
+        3:'y pos',
+        4: 'x vel',
+        5:'y vel',
+        6:'bias',
+        7:'thrust',
+        8: 'angle'
     }
     # Add nodes
     for node in genome["nodes"]:
-        nid = str(node["id"])
-        ntype = node["type"]  # 0=input, 1=output, 2=hidden, 3=bias?
+        n_name= node_names[node['id']] if ( node['id'] >= 0 and node['id'] <=8) else 'hidden' 
+        ntype = node["type"]  # 0=input, 1=output, 2=hidden, 3=bias
+        nid = str(node['id'])
         if ntype == 0:
-            dot.node(nid, f'{nid}', shape='circle', style='filled', color='lightblue')
+            dot.node(nid, n_name, shape='circle', style='filled', color='lightblue')
         elif ntype == 1:
-            dot.node(nid, f'Out {nid}', shape='doublecircle', style='filled', color='lightgreen')
+            dot.node(nid,n_name, shape='doublecircle', style='filled', color='lightgreen')
         elif ntype == 3:
-            dot.node(nid, f'Bias', shape='circle', style='filled', color='yellow')
+            dot.node(nid,n_name, shape='circle', style='filled', color='orange')
         else:
-            dot.node(nid, f'H {nid}', shape='circle', style='filled', color='white')
+            dot.node(nid,n_name, shape='circle', style='filled', color='white')
 
     # Add connections
     for conn in genome["connections"]:
