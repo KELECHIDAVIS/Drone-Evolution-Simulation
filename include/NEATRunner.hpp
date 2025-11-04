@@ -46,7 +46,7 @@ class NEATRunner{
 public:
     #ifdef NDEBUG
         // Release build
-        static constexpr int GENS = 1000; // release can handles much more generations much faster (1000+)
+        static constexpr int GENS = 10000; // release can handles much more generations much faster (1000+)
     #else
         // Debug build
         static constexpr int GENS = 1;
@@ -67,7 +67,8 @@ public:
     C2=1.5f, // how much weight disjoint genes have  
     C3= 1.f, //.4f, // how much weight weight differences have ; for larger pops should be increased 
     COMP_THRESHOLD=3.5f; // should change for larger pops  
-    static constexpr float HITS_FIT_MULTIPLIER= 4000, TIME_EFFICIENCY_FIT_MULTIPLIER =20, DISTANCE_FIT_MULTIPLIER=2;  
+    static constexpr float HITS_FIT_MULTIPLIER= 4000, TIME_EFFICIENCY_FIT_MULTIPLIER =500, DISTANCE_FIT_MULTIPLIER=2; 
+    static constexpr float TARGET_HIT_REQUIREMENT = 1000; // if they don't hit within this amount of frames they die  
     double MAX_TARGET_DIST = std::sqrt( ENV_HEIGHT*ENV_HEIGHT + ENV_WIDTH*ENV_WIDTH); 
     int globalInnvNum=0;
     int genNum=0; 
