@@ -203,7 +203,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
             break;
         }
 
-        Eigen::VectorXd input(4);
+        Eigen::VectorXd input(6);
         input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
         input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
         input(2) = ( env.rocket.pos(0)) / ENV_WIDTH;
