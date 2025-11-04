@@ -183,7 +183,7 @@ void NEATRunner::runGeneration()
 }
 
 // Single genome evaluation (non-parallel)
-// TODO: could possibly optimize since most genomes don't use all the frames in their sim lifetime and only live a fraction of that
+
 double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environment &env, int genomeIndx)
 {
     env.reset();
@@ -264,8 +264,8 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     fitness += distanceReward;
 
     // also reward living long 
-    fitness += (1.0 - (genFrames[genomeIndx].size()/SIM_LIFETIME)) *TIME_LIVED_MULTIPLIER; 
-    return std::max(0.0, fitness); // Ensure non-negative //TODO: MAKE SURE SCORE IS ACCURATEly getting updated when target is eaten
+    fitness *= genFrames[genomeIndx].size()/SIM_LIFETIME; // the longer you live the more of your fitness you get to keep  
+    return std::max(0.0, fitness); // Ensure non-negative
 }
 
 // Parallel wrapper
@@ -519,7 +519,7 @@ void NEATRunner::crossover()
     std::vector<Genome> nextGen;
     nextGen.reserve(genomes.size());
     int spotsLeft = genomes.size();
-    // TODO: REMOVE TESTING CODE
+    
     using namespace std;
     for (Species &species : speciesList)
     {
