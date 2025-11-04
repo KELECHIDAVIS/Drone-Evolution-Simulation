@@ -15,7 +15,7 @@ from read_data import getConstantData, getGenerationData
 import graphviz 
 # ---------- User options ----------
 releaseMode = True
-GEN_STEP = 10             
+GEN_STEP = 100             
 UPDATE_GRAPH_ON_GEN = True  # we update graphs only when generation changes
 # ----------------------------------
 

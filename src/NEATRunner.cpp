@@ -270,6 +270,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 
     // also reward living long 
     fitness *= genFrames[genomeIndx].size()/SIM_LIFETIME; // the longer you live the more of your fitness you get to keep  
+    
     return std::max(0.0, fitness); // Ensure non-negative
 }
 
