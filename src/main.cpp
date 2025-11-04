@@ -5,15 +5,9 @@ int main() {
     
     NEATRunner runner; 
     
-    #ifdef NDEBUG
-        // Release build
-        int generations = 1000; // release can handles much more generations much faster (1000+)
-    #else
-        // Debug build
-        int generations = 1;
-    #endif
+    
 
-    for(int i =0; i<generations; i++){
+    for(int i =0; i<NEATRunner::GENS ; i++){
         runner.runGeneration(); 
     }
 
