@@ -360,6 +360,21 @@ def draw_environment(surface, genData, frame_idx):
     # draw target and rocket polygon
     pygame.draw.circle(surface, (255, 0, 0), (int(target_x), int(target_y)), constants.get('TARGET_RADIUS', 5))
     verts = get_rocket_vertices(genData, frame_idx)
+
+    #draw thrust bar at top of screen 
+    thrust_val = f.get("thrust", 0 )
+    print(thrust_val)
+    color = (255, 0, 0)
+    #red if low green if hy orange in the middle 
+    
+    if thrust_val > .33 and thrust_val < .66:
+        color = (255, 122 , 0 )
+    elif thrust_val> .66: 
+        color = (0,255, 0 )
+
+    pygame.draw.rect(surface , color , (env_w-20, env_h - env_h*thrust_val, 20, env_h*thrust_val))
+    
+
     if verts:
         # convert to ints
         verts_int = [(int(x), int(y)) for (x, y) in verts]

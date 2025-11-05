@@ -195,14 +195,13 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     double closestDistance = std::numeric_limits<double>::infinity();
     double endingDistanceFromTarget = std::numeric_limits<double> :: infinity(); // incentivize finishing close to targets 
     
-    
     for (int step = 0; step < SIM_LIFETIME; step++)
     {
         assert(step < SIM_LIFETIME);
         if (!alive){
             break;
         }
-
+        
         Eigen::VectorXd input(6);
         input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
         input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
@@ -225,7 +224,6 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
             numHits++;
             totalTimeToHit += step; // Time penalty for slow hits
         }
-
         // store frames
         Eigen::Matrix<float, 2, 3> vertices = env.rocket.getVertices();
         ReplayFrame frame = {
@@ -265,6 +263,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
 
     // also reward living long 
     fitness *= genFrames[genomeIndx].size()/SIM_LIFETIME; // the longer you live the more of your fitness you get to keep  
+    
     return std::max(0.0, fitness); // Ensure non-negative
 }
 

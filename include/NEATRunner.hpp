@@ -10,8 +10,8 @@
 // fix memory issues with the genFrame array; each frame may be too big of an object
 //TODO: make the data types the most memory efficient to save space 
 struct ReplayFrame{
-    unsigned short frame; //0 -> sim_lifetime
-    unsigned short rocketRotation; //0 -> 360 
+    int frame; //0 -> sim_lifetime
+    int rocketRotation; //0 -> 360 
     float rocketThrust; // 0->1
     double rocketX;  
     double rocketY; 
@@ -49,13 +49,13 @@ public:
         static constexpr int GENS = 2000; // release can handles much more generations much faster (1000+)
     #else
         // Debug build
-        static constexpr int GENS = 1;
+        static constexpr int GENS = 10;
     #endif
-    static constexpr int POP_SIZE = 1000; // can go up to popsize = 1000 if needed  
-    static constexpr int ENV_WIDTH = 640, ENV_HEIGHT=640; 
-    static constexpr int SIM_LIFETIME =1000; // how many frames each genome gets  
+    static constexpr int POP_SIZE = 200; // can go up to popsize = 1000 if needed  
+    static constexpr int ENV_WIDTH = 640, ENV_HEIGHT=500; 
+    static constexpr int SIM_LIFETIME =2000; // how many frames each genome gets  
     static constexpr int STAGNATION_THRESHOLD = 15 ; // species are considered stagnant after this amt of gens without improvement in their best fitness
-    static constexpr float INIT_CONNECTIVITY_RATE= .4; // originally .5
+    static constexpr float INIT_CONNECTIVITY_RATE= .35; // originally .5
     static constexpr double WEIGHT_MUTATION_RATE = 0.8;
     static constexpr double WEIGHT_PERTURB_CHANCE = 0.9;
     static constexpr double PERTURB_DELTA = 0.25;
