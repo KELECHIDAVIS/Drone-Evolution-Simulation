@@ -33,7 +33,7 @@ WINDOW_WIDTH = constants['ENV_WIDTH'] * 3
 WINDOW_HEIGHT = constants['ENV_HEIGHT'] * 2
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Drone Simulation Analysis")
-font = pygame.font.SysFont("Space Mono", 20)
+font = pygame.font.SysFont("Space Mono", 30)
 clock = pygame.time.Clock()
 
 # layout: left = env (ENV_WIDTH * 0..ENV_WIDTH), center = stats (ENV_WIDTH .. 2*ENV_WIDTH), right = graphs (2*ENV_WIDTH .. 3*ENV_WIDTH)

@@ -41,7 +41,7 @@ NEATRunner::NEATRunner()
 {
     // IMPORTANT: Seed RNG at the start of the simulation
     // For deterministic testing, use a fixed seed:
-    RNGManager::seedRandom();//RNGManager::seed(12345); // or read from config
+    RNGManager::seedRandom(); //RNGManager::seed(12345); // or read from config
 
     // For non-deterministic runs (normal evolution):
     // RNGManager::seedRandom();
@@ -194,7 +194,6 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
     double totalTimeToHit = 0;
     double closestDistance = std::numeric_limits<double>::infinity();
     double endingDistanceFromTarget = std::numeric_limits<double> :: infinity(); // incentivize finishing close to targets 
-    int hitTimer  = 0 ; // the amount of time since the last hit 
     
     for (int step = 0; step < SIM_LIFETIME; step++)
     {
@@ -202,9 +201,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         if (!alive){
             break;
         }
-        if(hitTimer >= TARGET_HIT_REQUIREMENT){
-            break; // the rocket didn't hit the target in the set amount of time 
-        }
+        
         Eigen::VectorXd input(6);
         input(0) = (env.target.pos(0) - env.rocket.pos(0)) / ENV_WIDTH;
         input(1) = (env.target.pos(1) - env.rocket.pos(1)) / ENV_HEIGHT;
@@ -226,11 +223,7 @@ double NEATRunner::evaluateGenome(Genome &genome, NeuralNetwork &net, Environmen
         {
             numHits++;
             totalTimeToHit += step; // Time penalty for slow hits
-            hitTimer = 0 ; 
-        }else{
-            hitTimer++; 
         }
-
         // store frames
         Eigen::Matrix<float, 2, 3> vertices = env.rocket.getVertices();
         ReplayFrame frame = {
