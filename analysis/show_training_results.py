@@ -363,7 +363,6 @@ def draw_environment(surface, genData, frame_idx):
 
     #draw thrust bar at top of screen 
     thrust_val = f.get("thrust", 0 )
-    print(thrust_val)
     color = (255, 0, 0)
     #red if low green if hy orange in the middle 
     
