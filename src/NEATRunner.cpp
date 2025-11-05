@@ -41,7 +41,7 @@ NEATRunner::NEATRunner()
 {
     // IMPORTANT: Seed RNG at the start of the simulation
     // For deterministic testing, use a fixed seed:
-    RNGManager::seed(12345); // or read from config
+    RNGManager::seedRandom(); //RNGManager::seed(12345); // or read from config
 
     // For non-deterministic runs (normal evolution):
     // RNGManager::seedRandom();
